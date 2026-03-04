@@ -126,7 +126,7 @@ function Admin() {
                             <th>Pagado</th>
                             <th>Método</th>
                             <th>Usado</th>
-                            <th>Acciones</th>
+                            <th>Enviar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -177,11 +177,7 @@ function Admin() {
 
                                 <td>{ticket.used ? "Sí" : "No"}</td>
 
-                                <td style={{ display: "flex", gap: "10px" }}>
-                                    <button onClick={() => saveTicket(ticket)}>
-                                        Guardar
-                                    </button>
-
+                                <td>
                                     <button onClick={() => sendEmail(ticket)}>
                                         Enviar Entrada
                                     </button>
