@@ -4,6 +4,8 @@ import { supabase } from "./supabaseClient"
 function Admin() {
 
     const [tickets, setTickets] = useState([])
+    const [expenses, setExpenses] = useState([])
+
     const [tab, setTab] = useState("create")
     const [message, setMessage] = useState("")
 
@@ -11,11 +13,19 @@ function Admin() {
         buyer_name: "",
         email: "",
         paid: false,
-        payment_method: ""
+        payment_method: "",
+        amount: ""
+    })
+
+    const [expenseForm, setExpenseForm] = useState({
+        admin_name: "",
+        description: "",
+        amount: ""
     })
 
     useEffect(() => {
         fetchTickets()
+        fetchExpenses()
     }, [])
 
     async function fetchTickets() {
@@ -26,11 +36,32 @@ function Admin() {
         if (data) setTickets(data)
     }
 
+    async function fetchExpenses() {
+        const { data } = await supabase
+            .from("expenses")
+            .select("*")
+            .order("created_at", { ascending: false })
+
+        if (data) setExpenses(data)
+    }
+
     const total = tickets.length
     const registered = tickets.filter(t => t.assigned)
     const available = tickets.filter(t => !t.assigned)
     const used = tickets.filter(t => t.used)
     const paid = tickets.filter(t => t.paid)
+
+    const cashTotal = tickets
+        .filter(t => t.paid && t.payment_method === "Efectivo")
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0)
+
+    const transferTotal = tickets
+        .filter(t => t.paid && t.payment_method === "Transferencia")
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0)
+
+    const expenseTotal = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0)
+
+    const finalCash = cashTotal - expenseTotal
 
     async function saveToAvailableTicket() {
 
@@ -50,6 +81,7 @@ function Admin() {
                 email: form.email,
                 paid: form.paid,
                 payment_method: form.payment_method,
+                amount: form.amount,
                 assigned: true
             })
             .eq("id", availableTicket.id)
@@ -65,7 +97,8 @@ function Admin() {
             buyer_name: "",
             email: "",
             paid: false,
-            payment_method: ""
+            payment_method: "",
+            amount: ""
         })
 
         fetchTickets()
@@ -99,12 +132,33 @@ function Admin() {
         }
     }
 
+    async function addExpense() {
+
+        const { error } = await supabase
+            .from("expenses")
+            .insert([expenseForm])
+
+        if (error) {
+            setMessage("❌ Error al guardar gasto")
+            return
+        }
+
+        setExpenseForm({
+            admin_name: "",
+            description: "",
+            amount: ""
+        })
+
+        fetchExpenses()
+        setMessage("✅ Gasto registrado")
+    }
+
     return (
         <div className="admin-container">
 
             <h1>Panel Admin</h1>
 
-            {/* CONTADOR */}
+            {/* CONTADORES */}
             <div className="stats">
 
                 <div className="stat-card">
@@ -132,18 +186,46 @@ function Admin() {
                     <p>Pagadas</p>
                 </div>
 
+                <div className="stat-card">
+                    <h3>${cashTotal}</h3>
+                    <p>Efectivo esperado</p>
+                </div>
+
+                <div className="stat-card">
+                    <h3>${transferTotal}</h3>
+                    <p>Transferencia</p>
+                </div>
+
+                <div className="stat-card">
+                    <h3>${expenseTotal}</h3>
+                    <p>Gastos</p>
+                </div>
+
+                <div className="stat-card green">
+                    <h3>${finalCash}</h3>
+                    <p>Caja final</p>
+                </div>
+
             </div>
 
             <div className="tabs">
+
                 <button className={tab === "create" ? "tab active" : "tab"} onClick={() => setTab("create")}>
                     Crear
                 </button>
+
                 <button className={tab === "registered" ? "tab active" : "tab"} onClick={() => setTab("registered")}>
                     Registradas
                 </button>
+
                 <button className={tab === "available" ? "tab active" : "tab"} onClick={() => setTab("available")}>
                     Disponibles
                 </button>
+
+                <button className={tab === "expenses" ? "tab active" : "tab"} onClick={() => setTab("expenses")}>
+                    Gastos
+                </button>
+
             </div>
 
             {tab === "create" && (
@@ -162,6 +244,15 @@ function Admin() {
                         value={form.email}
                         onChange={(e) =>
                             setForm({ ...form, email: e.target.value })
+                        }
+                    />
+
+                    <input
+                        placeholder="Monto pagado"
+                        type="number"
+                        value={form.amount}
+                        onChange={(e) =>
+                            setForm({ ...form, amount: e.target.value })
                         }
                     />
 
@@ -187,17 +278,11 @@ function Admin() {
                         <option value="Transferencia">Transferencia</option>
                     </select>
 
-                    <button
-                        className="btn-primary"
-                        onClick={saveToAvailableTicket}
-                    >
+                    <button className="btn-primary" onClick={saveToAvailableTicket}>
                         Guardar
                     </button>
 
-                    <button
-                        className="btn-secondary"
-                        onClick={sendEmailToLastAssigned}
-                    >
+                    <button className="btn-secondary" onClick={sendEmailToLastAssigned}>
                         Enviar Correo
                     </button>
 
@@ -212,6 +297,8 @@ function Admin() {
                         <div className="ticket-code">{ticket.code}</div>
                         <p>{ticket.buyer_name}</p>
                         <p>{ticket.email}</p>
+                        <p>${ticket.amount}</p>
+                        <p>{ticket.payment_method}</p>
                     </div>
                 ))
             )}
@@ -223,6 +310,53 @@ function Admin() {
                         <p>Disponible</p>
                     </div>
                 ))
+            )}
+
+            {tab === "expenses" && (
+                <div>
+
+                    <div className="ticket-card">
+
+                        <input
+                            placeholder="Nombre admin"
+                            value={expenseForm.admin_name}
+                            onChange={(e) =>
+                                setExpenseForm({ ...expenseForm, admin_name: e.target.value })
+                            }
+                        />
+
+                        <input
+                            placeholder="Descripción"
+                            value={expenseForm.description}
+                            onChange={(e) =>
+                                setExpenseForm({ ...expenseForm, description: e.target.value })
+                            }
+                        />
+
+                        <input
+                            type="number"
+                            placeholder="Monto"
+                            value={expenseForm.amount}
+                            onChange={(e) =>
+                                setExpenseForm({ ...expenseForm, amount: e.target.value })
+                            }
+                        />
+
+                        <button className="btn-primary" onClick={addExpense}>
+                            Registrar gasto
+                        </button>
+
+                    </div>
+
+                    {expenses.map(exp => (
+                        <div key={exp.id} className="ticket-card">
+                            <p><strong>{exp.admin_name}</strong></p>
+                            <p>{exp.description}</p>
+                            <p>${exp.amount}</p>
+                        </div>
+                    ))}
+
+                </div>
             )}
 
         </div>
