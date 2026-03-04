@@ -26,10 +26,10 @@ export default async function handler(req, res) {
         const qr = await loadImage(qrData)
 
         /* POSICIÓN DEL QR */
-        const qrSize = 420
+        const qrSize = 500
 
         const x = (template.width / 2) - (qrSize / 2)
-        const y = 260
+        const y = 310
 
         ctx.drawImage(qr, x, y, qrSize, qrSize)
 
