@@ -1,12 +1,16 @@
+/* RESET */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* BODY */
+
 body {
   background: #000;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
   color: white;
 }
 
@@ -14,6 +18,8 @@ body {
 
 .page-content {
   padding: 20px;
+  max-width: 1100px;
+  margin: auto;
 }
 
 /* NAVBAR */
@@ -29,12 +35,12 @@ body {
 .nav-logo {
   font-weight: 800;
   font-size: 20px;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
 }
 
 .nav-links {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .nav-links button {
@@ -44,6 +50,11 @@ body {
   border-radius: 8px;
   color: white;
   cursor: pointer;
+  transition: .2s;
+}
+
+.nav-links button:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* HOME */
@@ -57,19 +68,19 @@ body {
 
 .home-center {
   text-align: center;
-  max-width: 420px;
   width: 100%;
+  max-width: 420px;
 }
 
 .home-title {
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 800;
   letter-spacing: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .home-subtitle {
-  color: #aaa;
+  color: #9ca3af;
   margin-bottom: 40px;
 }
 
@@ -80,13 +91,13 @@ body {
 }
 
 .home-btn {
-  padding: 20px;
+  padding: 22px;
   font-size: 20px;
   border-radius: 14px;
   border: none;
-  cursor: pointer;
   font-weight: 700;
-  transition: 0.25s;
+  cursor: pointer;
+  transition: .25s;
 }
 
 .home-btn.scan {
@@ -100,17 +111,35 @@ body {
 }
 
 .home-btn:hover {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
-/* SCAN */
+/* ADMIN */
 
-#reader {
-  border-radius: 16px;
-  overflow: hidden;
+.admin-container {
+  margin-top: 20px;
 }
 
-/* CARD STYLE */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #ff0080, #7928ca);
+}
+
+/* CARDS */
 
 .ticket-card {
   background: #0f0f0f;
@@ -118,20 +147,18 @@ body {
   padding: 16px;
   border-radius: 14px;
   margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .ticket-code {
   font-weight: 700;
+  font-size: 18px;
   color: #ff4ecd;
 }
 
-/* BUTTON */
-
-button {
-  font-family: inherit;
-}
-
-/* INPUT */
+/* INPUTS */
 
 input,
 select {
@@ -139,6 +166,29 @@ select {
   border-radius: 8px;
   border: none;
   font-size: 15px;
+}
+
+/* BUTTONS */
+
+button {
+  font-family: inherit;
+}
+
+button.primary {
+  background: linear-gradient(135deg, #ff0080, #7928ca);
+  color: white;
+}
+
+button.secondary {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+}
+
+/* MESSAGE */
+
+.message {
+  margin-top: 10px;
+  font-size: 14px;
 }
 
 /* DASHBOARD STATS */
@@ -160,182 +210,6 @@ select {
 
 .stat-card h3 {
   font-size: 24px;
-}
-
-@media (min-width:768px) {
-
-  .home-title {
-    font-size: 64px;
-  }
-
-  .stats {
-    grid-template-columns: repeat(5, 1fr);
-  }
-
-  .home-buttons {
-    flex-direction: row;
-  }
-
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #0f172a;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  color: white;
-}
-
-/* NAVBAR */
-
-.navbar {
-  background: #111827;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-links {
-  display: flex;
-  gap: 15px;
-}
-
-.nav-item {
-  text-decoration: none;
-  color: #94a3b8;
-}
-
-.nav-item.active {
-  color: #6366f1;
-  font-weight: bold;
-}
-
-/* ADMIN */
-
-.admin-container {
-  padding: 16px;
-}
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.tab {
-  padding: 8px 14px;
-  border-radius: 20px;
-  border: none;
-  background: #1e293b;
-  color: white;
-}
-
-.tab.active {
-  background: #6366f1;
-}
-
-.ticket-card {
-  background: #1e293b;
-  padding: 16px;
-  border-radius: 14px;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.ticket-code {
-  font-weight: bold;
-  font-size: 18px;
-  color: #38bdf8;
-}
-
-input,
-select {
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-}
-
-button {
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: #6366f1;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* SCAN */
-
-.scan-wrapper {
-  position: relative;
-}
-
-#reader {
-  width: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.scan-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 28px;
-  font-weight: bold;
-  z-index: 999;
-}
-
-.scan-overlay.valid {
-  background: #00e676;
-  color: black;
-}
-
-.scan-overlay.invalid {
-  background: #ff1744;
-}
-
-/* DESKTOP */
-
-@media (min-width: 768px) {
-
-  .admin-container {
-    max-width: 900px;
-    margin: auto;
-  }
-
-  .ticket-card {
-    padding: 24px;
-  }
-
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin: 20px 0;
-}
-
-.stat-card {
-  background: #1e293b;
-  padding: 16px;
-  border-radius: 14px;
-  text-align: center;
-}
-
-.stat-card h3 {
-  font-size: 22px;
   margin-bottom: 4px;
 }
 
@@ -355,82 +229,54 @@ button {
   border-left: 4px solid #facc15;
 }
 
-@media (min-width: 768px) {
-  .stats {
-    grid-template-columns: repeat(5, 1fr);
-  }
+/* SCAN */
+
+.scan-wrapper {
+  position: relative;
 }
 
-/* HOME */
+#reader {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+}
 
-.home-container {
-  min-height: 80vh;
+/* SCAN RESULT OVERLAY */
+
+.scan-overlay {
+  position: fixed;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  font-size: 32px;
+  font-weight: bold;
+  z-index: 999;
 }
 
-.home-center {
-  text-align: center;
-  max-width: 400px;
-  width: 100%;
-}
-
-.home-title {
-  font-size: 36px;
-  margin-bottom: 10px;
-  letter-spacing: 2px;
-}
-
-.home-subtitle {
-  color: #94a3b8;
-  margin-bottom: 40px;
-}
-
-.home-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.home-btn {
-  padding: 18px;
-  font-size: 18px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
-
-.home-btn.scan {
+.scan-overlay.valid {
   background: #22c55e;
   color: black;
 }
 
-.home-btn.admin {
-  background: #6366f1;
-  color: white;
+.scan-overlay.invalid {
+  background: #ef4444;
 }
 
-.home-btn:hover {
-  transform: scale(1.03);
-}
+/* DESKTOP */
 
-/* Desktop */
-@media (min-width: 768px) {
+@media(min-width:768px) {
 
   .home-title {
-    font-size: 48px;
+    font-size: 64px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(5, 1fr);
   }
 
   .home-buttons {
     flex-direction: row;
-  }
-
-  .home-btn {
-    flex: 1;
   }
 
 }
