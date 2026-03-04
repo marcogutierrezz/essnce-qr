@@ -5,12 +5,13 @@ function Home() {
     const navigate = useNavigate()
 
     return (
+
         <div className="home-container">
 
             <div className="home-center">
 
                 <h1 className="home-title">ESSNCE</h1>
-                <p className="home-subtitle">Sistema Oficial de Entradas</p>
+                <p className="home-subtitle">Sistema de control de entradas</p>
 
                 <div className="home-buttons">
 
@@ -33,7 +34,9 @@ function Home() {
             </div>
 
         </div>
+
     )
+
 }
 
 export default Home
