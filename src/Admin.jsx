@@ -67,7 +67,9 @@ function Admin() {
     const finalCash = cashTotal - expenseTotal
 
 
-    /* SWIPE START */
+    /* ---------------------------
+       SWIPE SYSTEM
+    ----------------------------*/
 
     function handleStart(e) {
         dragging.current = true
@@ -94,18 +96,16 @@ function Admin() {
         e.currentTarget.style.transform = "translateX(0px)"
         dragging.current = false
 
-        if (diff < -120) {
-            openEdit(ticket)
-        }
+        if (diff < -120) openEdit(ticket)
 
-        if (diff > 120) {
-            deleteTicket(ticket)
-        }
+        if (diff > 120) deleteTicket(ticket)
 
     }
 
 
-    /* DELETE */
+    /* ---------------------------
+       DELETE
+    ----------------------------*/
 
     async function deleteTicket(ticket) {
 
@@ -129,13 +129,15 @@ function Admin() {
     }
 
 
-    /* EDIT */
+    /* ---------------------------
+       EDIT POPUP
+    ----------------------------*/
 
     function openEdit(ticket) {
         setEditingTicket(ticket)
     }
 
-    async function updateTicket() {
+    async function updateAndResendTicket() {
 
         await supabase
             .from("tickets")
@@ -148,42 +150,31 @@ function Admin() {
             })
             .eq("id", editingTicket.id)
 
+        if (editingTicket.email) {
+
+            await fetch("/api/send-ticket", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: editingTicket.email,
+                    code: editingTicket.code,
+                    name: editingTicket.buyer_name
+                })
+            })
+
+        }
+
+        setMessage("✅ Entrada actualizada y reenviada")
+
         setEditingTicket(null)
+
         fetchTickets()
     }
 
 
-    /* RESEND EMAIL */
-
-    async function resendTicket(ticket) {
-
-        if (!ticket.email) {
-            setMessage("❌ Este ticket no tiene correo")
-            return
-        }
-
-        const response = await fetch("/api/send-ticket", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email: ticket.email,
-                code: ticket.code,
-                name: ticket.buyer_name
-            })
-        })
-
-        const result = await response.json()
-
-        if (result.success) {
-            setMessage("✅ Entrada reenviada")
-        } else {
-            setMessage("❌ Error reenviando")
-        }
-
-    }
-
-
-    /* CREATE + SEND EMAIL */
+    /* ---------------------------
+       CREATE + SEND EMAIL
+    ----------------------------*/
 
     async function saveToAvailableTicket() {
 
@@ -241,6 +232,10 @@ function Admin() {
     }
 
 
+    /* ---------------------------
+       EXPENSES
+    ----------------------------*/
+
     async function addExpense() {
 
         await supabase
@@ -262,6 +257,8 @@ function Admin() {
         <div className="admin-container">
 
             <h1>Panel Admin</h1>
+
+            {message && <p className="message">{message}</p>}
 
             {/* CONTADORES */}
 
@@ -319,21 +316,10 @@ function Admin() {
 
             <div className="tabs">
 
-                <button className={tab === "create" ? "tab active" : "tab"} onClick={() => setTab("create")}>
-                    Crear
-                </button>
-
-                <button className={tab === "registered" ? "tab active" : "tab"} onClick={() => setTab("registered")}>
-                    Registradas
-                </button>
-
-                <button className={tab === "available" ? "tab active" : "tab"} onClick={() => setTab("available")}>
-                    Disponibles
-                </button>
-
-                <button className={tab === "expenses" ? "tab active" : "tab"} onClick={() => setTab("expenses")}>
-                    Gastos
-                </button>
+                <button className={tab === "create" ? "tab active" : "tab"} onClick={() => setTab("create")}>Crear</button>
+                <button className={tab === "registered" ? "tab active" : "tab"} onClick={() => setTab("registered")}>Registradas</button>
+                <button className={tab === "available" ? "tab active" : "tab"} onClick={() => setTab("available")}>Disponibles</button>
+                <button className={tab === "expenses" ? "tab active" : "tab"} onClick={() => setTab("expenses")}>Gastos</button>
 
             </div>
 
@@ -344,47 +330,32 @@ function Admin() {
 
                 <div className="ticket-card">
 
-                    <input
-                        placeholder="Nombre"
+                    <input placeholder="Nombre"
                         value={form.buyer_name}
-                        onChange={(e) =>
-                            setForm({ ...form, buyer_name: e.target.value })
-                        }
+                        onChange={(e) => setForm({ ...form, buyer_name: e.target.value })}
                     />
 
-                    <input
-                        placeholder="Correo"
+                    <input placeholder="Correo"
                         value={form.email}
-                        onChange={(e) =>
-                            setForm({ ...form, email: e.target.value })
-                        }
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
                     />
 
-                    <input
-                        placeholder="Monto pagado"
-                        type="number"
+                    <input type="number" placeholder="Monto pagado"
                         value={form.amount}
-                        onChange={(e) =>
-                            setForm({ ...form, amount: e.target.value })
-                        }
+                        onChange={(e) => setForm({ ...form, amount: e.target.value })}
                     />
 
                     <label>
-                        <input
-                            type="checkbox"
+                        <input type="checkbox"
                             checked={form.paid}
-                            onChange={(e) =>
-                                setForm({ ...form, paid: e.target.checked })
-                            }
+                            onChange={(e) => setForm({ ...form, paid: e.target.checked })}
                         />
                         Pagado
                     </label>
 
                     <select
                         value={form.payment_method}
-                        onChange={(e) =>
-                            setForm({ ...form, payment_method: e.target.value })
-                        }
+                        onChange={(e) => setForm({ ...form, payment_method: e.target.value })}
                     >
                         <option value="">Método</option>
                         <option value="Efectivo">Efectivo</option>
@@ -409,6 +380,7 @@ function Admin() {
                     <div
                         key={ticket.id}
                         className="ticket-card"
+
                         onMouseDown={handleStart}
                         onMouseMove={handleMove}
                         onMouseUp={(e) => handleEnd(e, ticket)}
@@ -433,82 +405,55 @@ function Admin() {
             )}
 
 
-            {/* EDIT SCREEN */}
+            {/* EDIT POPUP */}
 
             {editingTicket && (
 
-                <div className="ticket-card">
+                <div className="edit-overlay">
 
-                    <h3>Editar Entrada</h3>
+                    <div className="edit-popup">
 
-                    <input
-                        value={editingTicket.buyer_name}
-                        onChange={(e) =>
-                            setEditingTicket({
-                                ...editingTicket,
-                                buyer_name: e.target.value
-                            })
-                        }
-                    />
+                        <h3>Editar Entrada</h3>
 
-                    <input
-                        value={editingTicket.email}
-                        onChange={(e) =>
-                            setEditingTicket({
-                                ...editingTicket,
-                                email: e.target.value
-                            })
-                        }
-                    />
+                        <input
+                            value={editingTicket.buyer_name}
+                            onChange={(e) => setEditingTicket({ ...editingTicket, buyer_name: e.target.value })}
+                        />
 
-                    <input
-                        type="number"
-                        value={editingTicket.amount}
-                        onChange={(e) =>
-                            setEditingTicket({
-                                ...editingTicket,
-                                amount: e.target.value
-                            })
-                        }
-                    />
+                        <input
+                            value={editingTicket.email}
+                            onChange={(e) => setEditingTicket({ ...editingTicket, email: e.target.value })}
+                        />
 
-                    <select
-                        value={editingTicket.payment_method}
-                        onChange={(e) =>
-                            setEditingTicket({
-                                ...editingTicket,
-                                payment_method: e.target.value
-                            })
-                        }
-                    >
-                        <option value="Efectivo">Efectivo</option>
-                        <option value="Transferencia">Transferencia</option>
-                    </select>
+                        <input
+                            type="number"
+                            value={editingTicket.amount}
+                            onChange={(e) => setEditingTicket({ ...editingTicket, amount: e.target.value })}
+                        />
 
-                    <button className="btn-primary" onClick={updateTicket}>
-                        Guardar cambios
-                    </button>
+                        <select
+                            value={editingTicket.payment_method}
+                            onChange={(e) => setEditingTicket({ ...editingTicket, payment_method: e.target.value })}
+                        >
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
 
-                    <button
-                        className="btn-secondary"
-                        onClick={() => resendTicket(editingTicket)}
-                    >
-                        Enviar entrada de nuevo
-                    </button>
+                        <button className="btn-primary" onClick={updateAndResendTicket}>
+                            Guardar y reenviar entrada
+                        </button>
 
-                    <button
-                        className="btn-secondary"
-                        onClick={() => setEditingTicket(null)}
-                    >
-                        Cancelar
-                    </button>
+                        <button className="btn-secondary" onClick={() => setEditingTicket(null)}>
+                            Cancelar
+                        </button>
+
+                    </div>
 
                 </div>
 
             )}
 
         </div>
-
     )
 }
 
