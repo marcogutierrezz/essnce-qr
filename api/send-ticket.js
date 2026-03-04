@@ -1,48 +1,72 @@
-import { Resend } from 'resend'
-import QRCode from 'qrcode'
+import QRCode from "qrcode"
+import { createCanvas, loadImage } from "canvas"
+import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export default async function handler(req, res) {
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: "Method not allowed" })
-    }
-
     const { email, code, name } = req.body
 
     try {
 
-        const url = `https://essnce-qr.vercel.app/validate/${code}`
+        const qrData = `https://essnce-qr.vercel.app/validate/${code}`
 
-        // Generar QR en base64
-        const qrImage = await QRCode.toDataURL(url)
+        const qrImage = await QRCode.toDataURL(qrData)
 
-        // Quitar el prefijo "data:image/png;base64,"
-        const base64Data = qrImage.split(",")[1]
+        const template = await loadImage("./public/ticket-template.jpg")
+
+        const canvas = createCanvas(template.width, template.height)
+        const ctx = canvas.getContext("2d")
+
+        ctx.drawImage(template, 0, 0)
+
+        const qr = await loadImage(qrImage)
+
+        /* POSICIÓN DEL QR */
+        /* AJUSTA SI ES NECESARIO */
+
+        ctx.drawImage(qr, 340, 330, 400, 400)
+
+        /* Nombre opcional */
+
+        ctx.fillStyle = "white"
+        ctx.font = "bold 50px Montserrat"
+        ctx.textAlign = "center"
+
+        ctx.fillText(name || "", template.width / 2, 850)
+
+        const buffer = canvas.toBuffer()
 
         await resend.emails.send({
-            from: 'Essnce <onboarding@resend.dev>',
+
+            from: "Essnce <onboarding@resend.dev>",
+
             to: email,
-            subject: 'Tu entrada para Essnce',
+
+            subject: "Tu entrada para Essnce",
+
             html: `
-        <h1>Hola ${name}</h1>
-        <p>Aquí está tu entrada oficial para Essnce.</p>
-        <p>No compartas este código.</p>
-      `,
+<h2>Tu entrada para Essnce</h2>
+<p>Presenta esta entrada en la puerta.</p>
+`,
+
             attachments: [
                 {
-                    filename: `entrada-${code}.png`,
-                    content: base64Data,
-                    encoding: "base64"
+                    filename: "entrada-essnce.png",
+                    content: buffer
                 }
             ]
+
         })
 
-        return res.status(200).json({ success: true })
+        res.status(200).json({ success: true })
 
-    } catch (error) {
-        console.error(error)
-        return res.status(500).json({ error: error.message })
+    } catch (err) {
+
+        console.log(err)
+        res.status(500).json({ error: "error enviando email" })
+
     }
+
 }
