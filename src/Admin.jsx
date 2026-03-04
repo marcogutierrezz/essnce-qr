@@ -49,65 +49,68 @@ function Admin() {
     }
 
     return (
-        <div style={{ padding: "40px" }}>
-            <h1>Panel Admin Essnce</h1>
+        <div className="container">
+            <div className="card">
+                <h1>Panel Admin Essnce</h1>
 
-            <button onClick={exportToExcel}>
-                Exportar a Excel
-            </button>
+                <button onClick={exportToExcel}>
+                    Exportar a Excel
+                </button>
 
-            <table border="1" cellPadding="8" style={{ marginTop: "20px" }}>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Código</th>
-                        <th>Pagado</th>
-                        <th>Método</th>
-                        <th>Usado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tickets.map(ticket => (
-                        <tr key={ticket.id}>
-                            <td>
-                                <input
-                                    value={ticket.buyer_name || ""}
-                                    onChange={(e) =>
-                                        updateTicket(ticket.id, "buyer_name", e.target.value)
-                                    }
-                                />
-                            </td>
-
-                            <td>{ticket.code}</td>
-
-                            <td>
-                                <input
-                                    type="checkbox"
-                                    checked={ticket.paid || false}
-                                    onChange={(e) =>
-                                        updateTicket(ticket.id, "paid", e.target.checked)
-                                    }
-                                />
-                            </td>
-
-                            <td>
-                                <select
-                                    value={ticket.payment_method || ""}
-                                    onChange={(e) =>
-                                        updateTicket(ticket.id, "payment_method", e.target.value)
-                                    }
-                                >
-                                    <option value="">Seleccionar</option>
-                                    <option value="Efectivo">Efectivo</option>
-                                    <option value="Transferencia">Transferencia</option>
-                                </select>
-                            </td>
-
-                            <td>{ticket.used ? "Sí" : "No"}</td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Código</th>
+                            <th>Pagado</th>
+                            <th>Método</th>
+                            <th>Usado</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {tickets.map(ticket => (
+                            <tr key={ticket.id}>
+                                <td>
+                                    <input
+                                        value={ticket.buyer_name || ""}
+                                        onChange={(e) =>
+                                            updateTicket(ticket.id, "buyer_name", e.target.value)
+                                        }
+                                    />
+                                </td>
+
+                                <td>{ticket.code}</td>
+
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={ticket.paid || false}
+                                        onChange={(e) =>
+                                            updateTicket(ticket.id, "paid", e.target.checked)
+                                        }
+                                    />
+                                </td>
+
+                                <td>
+                                    <select
+                                        value={ticket.payment_method || ""}
+                                        onChange={(e) =>
+                                            updateTicket(ticket.id, "payment_method", e.target.value)
+                                        }
+                                    >
+                                        <option value="">Seleccionar</option>
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Transferencia">Transferencia</option>
+                                    </select>
+                                </td>
+
+                                <td>{ticket.used ? "Sí" : "No"}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+            </div>
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+import "./App.css"
 
 function Validate() {
 
@@ -35,22 +36,26 @@ function Validate() {
     }, [code])
 
     if (status === "checking") {
-        return <h1 style={{ padding: "40px" }}>Verificando...</h1>
+        return (
+            <div className="container">
+                <h1>Verificando entrada...</h1>
+            </div>
+        )
     }
 
     if (status === "valid") {
         return (
-            <div style={{ background: "#00ff88", color: "white", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <h1>ENTRADA VÁLIDA</h1>
-                <h2 style={{ fontSize: "30px" }}>BIENVENIDO A ESSNCE</h2>
+            <div className="valid-screen">
+                ENTRADA VÁLIDA
+                <h2>Bienvenido a Essnce</h2>
             </div>
         )
     }
 
     if (status === "invalid_or_used") {
         return (
-            <div style={{ background: "#ff0033", color: "white", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <h1>ENTRADA INVÁLIDA O YA USADA</h1>
+            <div className="invalid-screen">
+                ENTRADA INVÁLIDA O YA USADA
             </div>
         )
     }

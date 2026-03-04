@@ -1,38 +1,127 @@
-body {
+/* ===== GLOBAL RESET ===== */
+* {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0d0d0d;
-  color: white;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+body {
+  font-family: "Inter", sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* ===== HEADINGS ===== */
 h1 {
-  color: #ff0066;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
 }
 
+h2 {
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* ===== BUTTONS ===== */
 button {
-  background: #ff0066;
-  color: white;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 button:hover {
-  background: #cc0052;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
 }
 
+/* ===== TABLE ===== */
 table {
   width: 100%;
-  background: #1a1a1a;
+  margin-top: 20px;
   border-collapse: collapse;
+  background: #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 th {
-  background: #111;
+  background: #111827;
+  text-align: left;
+  padding: 14px;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
-td,
-th {
-  border: 1px solid #333;
+td {
+  padding: 14px;
+  border-top: 1px solid #334155;
+}
+
+tr:hover {
+  background: #243043;
+}
+
+/* ===== INPUTS ===== */
+input,
+select {
+  background: #0f172a;
+  border: 1px solid #334155;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: white;
+  width: 100%;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+/* ===== VALIDATION SCREEN ===== */
+.valid-screen {
+  background: linear-gradient(135deg, #00c853, #00e676);
+  color: black;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.invalid-screen {
+  background: linear-gradient(135deg, #ff1744, #ff5252);
+  color: white;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+/* ===== CARD STYLE ===== */
+.card {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
