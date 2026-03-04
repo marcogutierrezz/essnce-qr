@@ -1,36 +1,74 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  background: #0f172a;
+  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0f172a;
   color: white;
 }
 
-.page-content {
-  padding: 16px;
+.navbar {
+  position: sticky;
+  top: 0;
+  background: #111827;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
 }
 
-/* ADMIN */
-
-.admin-header {
-  margin-bottom: 20px;
+.logo {
+  font-weight: bold;
+  font-size: 18px;
 }
 
-.admin-actions {
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #94a3b8;
+}
+
+.nav-item.active {
+  color: #6366f1;
+  font-weight: bold;
+}
+
+.admin-container {
+  padding: 20px;
+}
+
+.admin-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tabs {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin: 20px 0;
+}
+
+.tab {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: none;
+  background: #1e293b;
+  color: white;
+}
+
+.tab.active {
+  background: #6366f1;
 }
 
 .ticket-card {
   background: #1e293b;
-  padding: 16px;
+  padding: 15px;
   border-radius: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -38,55 +76,40 @@ body {
 
 .ticket-code {
   font-weight: bold;
-  font-size: 18px;
   color: #38bdf8;
 }
 
-input,
-select {
-  padding: 12px;
+input {
+  padding: 10px;
   border-radius: 8px;
   border: none;
-  font-size: 16px;
 }
 
 button {
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   border: none;
   background: #6366f1;
   color: white;
   font-weight: 600;
-  cursor: pointer;
 }
 
-.row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* SCAN */
-
-.scan-wrapper {
-  position: relative;
+.scan-container {
+  padding: 20px;
 }
 
 #reader {
   width: 100%;
-  border-radius: 12px;
-  overflow: hidden;
 }
 
 .scan-overlay {
   position: fixed;
   inset: 0;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 28px;
-  font-weight: bold;
-  z-index: 999;
+  gap: 20px;
 }
 
 .scan-overlay.valid {

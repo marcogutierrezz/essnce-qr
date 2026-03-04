@@ -13,9 +13,21 @@ function Scan() {
         const qr = new Html5Qrcode("reader")
         qrRef.current = qr
 
-        qr.start(
+        startScanner()
+
+        return () => {
+            stopScanner()
+        }
+
+    }, [])
+
+    async function startScanner() {
+
+        const qr = qrRef.current
+
+        await qr.start(
             { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
+            { fps: 8, qrbox: 250 },
             async (decodedText) => {
 
                 if (!scanning) return
@@ -25,6 +37,8 @@ function Scan() {
                 const parts = decodedText.split("/")
                 const code = parts[parts.length - 1]
 
+                await stopScanner()
+
                 const { data } = await supabase
                     .from("tickets")
                     .update({ used: true })
@@ -33,29 +47,35 @@ function Scan() {
                     .select()
 
                 setResult(data && data.length > 0 ? "valid" : "invalid")
-
-                setTimeout(() => {
-                    setResult(null)
-                    setScanning(true)
-                }, 2000)
-
             }
         )
+    }
 
-        return () => {
-            qr.stop().catch(() => { })
-        }
+    async function stopScanner() {
+        try {
+            await qrRef.current.stop()
+        } catch { }
+    }
 
-    }, [])
+    async function scanAgain() {
+        setResult(null)
+        setScanning(true)
+        startScanner()
+    }
 
     return (
-        <div className="scan-wrapper">
+        <div className="scan-container">
 
             <div id="reader"></div>
 
             {result && (
                 <div className={`scan-overlay ${result}`}>
-                    {result === "valid" ? "ENTRADA VÁLIDA" : "ENTRADA INVÁLIDA"}
+                    <h1>
+                        {result === "valid" ? "ENTRADA VÁLIDA" : "ENTRADA INVÁLIDA"}
+                    </h1>
+                    <button onClick={scanAgain}>
+                        Escanear otra
+                    </button>
                 </div>
             )}
 
