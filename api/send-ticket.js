@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         const qrImage = await QRCode.toDataURL(url)
 
         await resend.emails.send({
-            from: 'Essnce <tickets@essnce.com>',
+            from: 'Essnce <onboarding@resend.dev>',
             to: email,
             subject: 'Tu entrada para Essnce',
             html: `
