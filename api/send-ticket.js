@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         const qr = await loadImage(qrData)
 
         /* POSICIÓN DEL QR */
-        ctx.drawImage(qr, 330, 230, 200, 200)
+        ctx.drawImage(qr, 360, 210, 260, 260)
 
         const buffer = canvas.toBuffer("image/png")
 
