@@ -1,29 +1,22 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
-import Home from './Home'
-import Validate from './Validate'
-import Scan from './Scan'
-import Admin from './Admin'
-import GenerateQR from './GenerateQR'
-import Navbar from './Navbar'
+import { Routes, Route } from "react-router-dom"
+import Navbar from "./Navbar"
+import Home from "./Home"
+import Admin from "./Admin"
+import Scan from "./Scan"
 
 function App() {
-
-  const location = useLocation()
-
-  const hideNavbar = location.pathname.startsWith("/validate")
-
   return (
-    <>
-      {!hideNavbar && <Navbar />}
+    <div className="app-layout">
+      <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/validate/:code" element={<Validate />} />
-        <Route path="/scan" element={<Scan />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/generate" element={<GenerateQR />} />
-      </Routes>
-    </>
+      <div className="page-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/scan" element={<Scan />} />
+        </Routes>
+      </div>
+    </div>
   )
 }
 

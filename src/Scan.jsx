@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Html5Qrcode } from "html5-qrcode"
 import { supabase } from "./supabaseClient"
+import "./App.css"
 
 function Scan() {
 
@@ -52,11 +53,10 @@ function Scan() {
                     setResult("valid")
                 }
 
-                // Esperar 2 segundos y volver a escanear
                 setTimeout(() => {
                     setResult(null)
                     setScanning(true)
-                }, 2000)
+                }, 1800)
 
             },
             () => { }
@@ -64,55 +64,32 @@ function Scan() {
     }
 
     return (
-        <div style={{ position: "relative" }}>
+        <div className="scan-wrapper">
 
-            <div id="reader" style={{ width: "100%" }}></div>
+            <h1 className="scan-title">Escanear Entrada</h1>
+
+            <div id="reader" style={{ width: "90%", maxWidth: "400px" }}></div>
 
             {result === "valid" && (
-                <div style={overlayValid}>
+                <div className="overlay valid">
                     ENTRADA VÁLIDA
+                    <div className="overlay-subtext">
+                        Bienvenido a Essnce
+                    </div>
                 </div>
             )}
 
             {result === "invalid" && (
-                <div style={overlayInvalid}>
-                    ENTRADA INVÁLIDA O YA USADA
+                <div className="overlay invalid">
+                    ENTRADA INVÁLIDA
+                    <div className="overlay-subtext">
+                        Ya fue usada o no existe
+                    </div>
                 </div>
             )}
 
         </div>
     )
-}
-
-const overlayValid = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "#00e676",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontSize: "40px",
-    fontWeight: "bold",
-    zIndex: 9999
-}
-
-const overlayInvalid = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "#ff1744",
-    color: "white",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontSize: "40px",
-    fontWeight: "bold",
-    zIndex: 9999
 }
 
 export default Scan
