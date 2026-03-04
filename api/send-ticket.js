@@ -1,76 +1,68 @@
-import nodemailer from "nodemailer"
+import { createCanvas, loadImage } from "@napi-rs/canvas"
 import QRCode from "qrcode"
-import fs from "fs"
-import path from "path"
-import sharp from "sharp"
+import { Resend } from "resend"
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export default async function handler(req, res) {
 
     try {
 
-        const { email, code, name } = req.body
+        const { email, code } = req.body
 
-        if (!email || !code) {
-            return res.status(400).json({ success: false })
-        }
+        const template = await loadImage(
+            "https://essnce-qr.vercel.app/ticket-template.jpg"
+        )
 
-        /* GENERAR QR */
+        const canvas = createCanvas(template.width, template.height)
+        const ctx = canvas.getContext("2d")
 
-        const qrBuffer = await QRCode.toBuffer(code)
+        ctx.drawImage(template, 0, 0)
 
-        /* CARGAR TEMPLATE */
+        const qrData = await QRCode.toDataURL(
+            `https://essnce-qr.vercel.app/validate/${code}`
+        )
 
-        const templatePath = path.join(process.cwd(), "public", "entrada-essnce.png")
+        const qr = await loadImage(qrData)
 
-        const template = fs.readFileSync(templatePath)
+        /* POSICIÓN DEL QR */
+        const qrSize = 440
 
-        /* CREAR IMAGEN FINAL */
+        const x = (template.width / 2) - (qrSize / 2)
+        const y = 309
 
-        const finalImage = await sharp(template)
-            .composite([
-                {
-                    input: qrBuffer,
-                    top: 980,
-                    left: 440,
-                    width: 420,
-                    height: 420
-                }
-            ])
-            .png()
-            .toBuffer()
+        ctx.drawImage(qr, x, y, qrSize, qrSize)
 
-        /* CONFIGURAR EMAIL */
+        const buffer = canvas.toBuffer("image/png")
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        })
+        await resend.emails.send({
 
-        /* ENVIAR EMAIL */
+            from: "Essnce <onboarding@resend.dev>",
 
-        await transporter.sendMail({
-            from: `"ESSNCE" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: "Tu entrada ESSNCE",
-            html: `<p>Hola ${name || ""}, aquí está tu entrada.</p>`,
+
+            subject: "Tu entrada para Essnce",
+
+            html: `
+<h2>Tu entrada para Essnce</h2>
+<p>Presenta esta entrada en la puerta</p>
+`,
+
             attachments: [
                 {
-                    filename: "entrada.png",
-                    content: finalImage
+                    filename: "entrada-essnce.png",
+                    content: buffer
                 }
             ]
+
         })
 
-        return res.status(200).json({ success: true })
+        res.status(200).json({ success: true })
 
-    } catch (error) {
+    } catch (err) {
 
-        console.error(error)
-
-        return res.status(500).json({ success: false })
+        console.log(err)
+        res.status(500).json({ error: "email failed" })
 
     }
 
