@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
-import "./App.css"
 
 function Validate() {
 
@@ -12,20 +11,17 @@ function Validate() {
 
         async function validateTicket() {
 
-            const { data, error } = await supabase
+            setStatus("checking")
+
+            const { data } = await supabase
                 .from('tickets')
                 .update({ used: true, used_at: new Date() })
                 .eq('code', code)
                 .eq('used', false)
                 .select()
 
-            if (error) {
-                setStatus("error")
-                return
-            }
-
-            if (data.length === 0) {
-                setStatus("invalid_or_used")
+            if (!data || data.length === 0) {
+                setStatus("invalid")
             } else {
                 setStatus("valid")
             }
@@ -38,7 +34,7 @@ function Validate() {
     if (status === "checking") {
         return (
             <div className="container">
-                <h1>Verificando entrada...</h1>
+                <h1>Verificando...</h1>
             </div>
         )
     }
@@ -48,14 +44,28 @@ function Validate() {
             <div className="valid-screen">
                 ENTRADA VÁLIDA
                 <h2>Bienvenido a Essnce</h2>
+
+                <button
+                    style={{ marginTop: "30px" }}
+                    onClick={() => window.location.href = "/scan"}
+                >
+                    Escanear Otro
+                </button>
             </div>
         )
     }
 
-    if (status === "invalid_or_used") {
+    if (status === "invalid") {
         return (
             <div className="invalid-screen">
                 ENTRADA INVÁLIDA O YA USADA
+
+                <button
+                    style={{ marginTop: "30px" }}
+                    onClick={() => window.location.href = "/scan"}
+                >
+                    Escanear Otro
+                </button>
             </div>
         )
     }

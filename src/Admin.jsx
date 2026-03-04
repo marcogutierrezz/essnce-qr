@@ -26,13 +26,26 @@ function Admin() {
         setTickets(data)
     }
 
-    async function updateTicket(id, field, value) {
+    function handleLocalChange(id, field, value) {
+        setTickets(prev =>
+            prev.map(ticket =>
+                ticket.id === id ? { ...ticket, [field]: value } : ticket
+            )
+        )
+    }
+
+    async function saveTicket(ticket) {
         await supabase
             .from("tickets")
-            .update({ [field]: value })
-            .eq("id", id)
+            .update({
+                buyer_name: ticket.buyer_name,
+                email: ticket.email,
+                paid: ticket.paid,
+                payment_method: ticket.payment_method
+            })
+            .eq("id", ticket.id)
 
-        fetchTickets()
+        alert("Guardado correctamente")
     }
 
     async function sendEmail(ticket) {
@@ -49,9 +62,7 @@ function Admin() {
 
         const response = await fetch("/api/send-ticket", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 email: ticket.email,
                 code: ticket.code,
@@ -62,13 +73,12 @@ function Admin() {
         const result = await response.json()
 
         if (result.success) {
-            alert("Entrada enviada correctamente")
-
             await supabase
                 .from("tickets")
                 .update({ assigned: true })
                 .eq("id", ticket.id)
 
+            alert("Entrada enviada correctamente")
             fetchTickets()
         } else {
             alert("Error al enviar correo")
@@ -116,7 +126,7 @@ function Admin() {
                             <th>Pagado</th>
                             <th>Método</th>
                             <th>Usado</th>
-                            <th>Enviar</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -126,7 +136,7 @@ function Admin() {
                                     <input
                                         value={ticket.buyer_name || ""}
                                         onChange={(e) =>
-                                            updateTicket(ticket.id, "buyer_name", e.target.value)
+                                            handleLocalChange(ticket.id, "buyer_name", e.target.value)
                                         }
                                     />
                                 </td>
@@ -135,7 +145,7 @@ function Admin() {
                                     <input
                                         value={ticket.email || ""}
                                         onChange={(e) =>
-                                            updateTicket(ticket.id, "email", e.target.value)
+                                            handleLocalChange(ticket.id, "email", e.target.value)
                                         }
                                     />
                                 </td>
@@ -147,7 +157,7 @@ function Admin() {
                                         type="checkbox"
                                         checked={ticket.paid || false}
                                         onChange={(e) =>
-                                            updateTicket(ticket.id, "paid", e.target.checked)
+                                            handleLocalChange(ticket.id, "paid", e.target.checked)
                                         }
                                     />
                                 </td>
@@ -156,7 +166,7 @@ function Admin() {
                                     <select
                                         value={ticket.payment_method || ""}
                                         onChange={(e) =>
-                                            updateTicket(ticket.id, "payment_method", e.target.value)
+                                            handleLocalChange(ticket.id, "payment_method", e.target.value)
                                         }
                                     >
                                         <option value="">Seleccionar</option>
@@ -167,7 +177,11 @@ function Admin() {
 
                                 <td>{ticket.used ? "Sí" : "No"}</td>
 
-                                <td>
+                                <td style={{ display: "flex", gap: "10px" }}>
+                                    <button onClick={() => saveTicket(ticket)}>
+                                        Guardar
+                                    </button>
+
                                     <button onClick={() => sendEmail(ticket)}>
                                         Enviar Entrada
                                     </button>
