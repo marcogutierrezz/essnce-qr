@@ -187,11 +187,17 @@ function Admin() {
                         <option value="Transferencia">Transferencia</option>
                     </select>
 
-                    <button onClick={saveToAvailableTicket}>
+                    <button
+                        className="btn-primary"
+                        onClick={saveToAvailableTicket}
+                    >
                         Guardar
                     </button>
 
-                    <button onClick={sendEmailToLastAssigned}>
+                    <button
+                        className="btn-secondary"
+                        onClick={sendEmailToLastAssigned}
+                    >
                         Enviar Correo
                     </button>
 
