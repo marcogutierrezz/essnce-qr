@@ -12,19 +12,19 @@ function Scan() {
 
         qr.start(
             { facingMode: "environment" },
-            {
-                fps: 10,
-                qrbox: 250
-            },
+            { fps: 10, qrbox: 250 },
             (decodedText) => {
 
-                qr.stop()
-                navigate(decodedText.replace(window.location.origin, ""))
+                // Extraer el código al final del URL
+                const parts = decodedText.split("/")
+                const code = parts[parts.length - 1]
+
+                qr.stop().then(() => {
+                    navigate(`/validate/${code}`)
+                })
 
             },
-            (errorMessage) => {
-                // ignora errores mientras busca QR
-            }
+            () => { }
         )
 
         return () => {
@@ -34,9 +34,9 @@ function Scan() {
     }, [])
 
     return (
-        <div style={{ padding: "20px" }}>
+        <div className="container">
             <h1>Escanear Entrada</h1>
-            <div id="reader" style={{ width: "300px" }}></div>
+            <div id="reader" style={{ width: "100%", maxWidth: "400px" }}></div>
         </div>
     )
 }
