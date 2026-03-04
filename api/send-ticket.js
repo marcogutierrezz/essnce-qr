@@ -1,42 +1,17 @@
 import QRCode from "qrcode"
-import { createCanvas, loadImage } from "canvas"
 import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export default async function handler(req, res) {
 
-    const { email, code, name } = req.body
-
     try {
 
-        const qrData = `https://essnce-qr.vercel.app/validate/${code}`
+        const { email, code, name } = req.body
 
-        const qrImage = await QRCode.toDataURL(qrData)
-
-        const template = await loadImage("./public/ticket-template.jpg")
-
-        const canvas = createCanvas(template.width, template.height)
-        const ctx = canvas.getContext("2d")
-
-        ctx.drawImage(template, 0, 0)
-
-        const qr = await loadImage(qrImage)
-
-        /* POSICIÓN DEL QR */
-        /* AJUSTA SI ES NECESARIO */
-
-        ctx.drawImage(qr, 340, 330, 400, 400)
-
-        /* Nombre opcional */
-
-        ctx.fillStyle = "white"
-        ctx.font = "bold 50px Montserrat"
-        ctx.textAlign = "center"
-
-        ctx.fillText(name || "", template.width / 2, 850)
-
-        const buffer = canvas.toBuffer()
+        const qrUrl = await QRCode.toDataURL(
+            `https://essnce-qr.vercel.app/validate/${code}`
+        )
 
         await resend.emails.send({
 
@@ -47,16 +22,49 @@ export default async function handler(req, res) {
             subject: "Tu entrada para Essnce",
 
             html: `
-<h2>Tu entrada para Essnce</h2>
-<p>Presenta esta entrada en la puerta.</p>
-`,
 
-            attachments: [
-                {
-                    filename: "entrada-essnce.png",
-                    content: buffer
-                }
-            ]
+<div style="
+font-family:Montserrat, sans-serif;
+background:black;
+padding:20px;
+text-align:center;
+">
+
+<div style="
+position:relative;
+display:inline-block;
+max-width:400px;
+">
+
+<img
+src="https://essnce-qr.vercel.app/ticket-template.jpg"
+style="width:100%;border-radius:10px"
+/>
+
+<img
+src="${qrUrl}"
+style="
+position:absolute;
+top:220px;
+left:50%;
+transform:translateX(-50%);
+width:180px;
+height:180px;
+background:white;
+padding:10px;
+border-radius:12px;
+"
+/>
+
+</div>
+
+<p style="margin-top:20px;color:white">
+Presenta este QR en la entrada
+</p>
+
+</div>
+
+`
 
         })
 
@@ -65,7 +73,8 @@ export default async function handler(req, res) {
     } catch (err) {
 
         console.log(err)
-        res.status(500).json({ error: "error enviando email" })
+
+        res.status(500).json({ error: "email failed" })
 
     }
 
