@@ -45,7 +45,15 @@ function Scan() {
 
         try {
 
-            const code = decodedText.split("ticket=")[1]
+            let code = decodedText
+
+            if (decodedText.includes("ticket=")) {
+                code = decodedText.split("ticket=")[1]
+            }
+
+            if (decodedText.includes("/validate/")) {
+                code = decodedText.split("/validate/")[1]
+            }
 
             const { data } = await supabase
                 .from("tickets")
@@ -75,7 +83,7 @@ function Scan() {
 
             }
 
-        } catch (err) {
+        } catch (error) {
 
             setStatus("invalid")
             setMessage("Error al validar")
