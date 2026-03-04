@@ -1,3 +1,5 @@
+import { createCanvas, loadImage } from "@napi-rs/canvas"
+import QRCode from "qrcode"
 import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -8,24 +10,46 @@ export default async function handler(req, res) {
 
         const { email, code } = req.body
 
-        const qr = encodeURIComponent(
-            `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://essnce-qr.vercel.app/validate/${code}`
+        const template = await loadImage(
+            "https://essnce-qr.vercel.app/ticket-template.jpg"
         )
 
-        const ticketImage = `https://images.weserv.nl/?url=essnce-qr.vercel.app/ticket-template.jpg&overlay=${qr}&overlay_x=330&overlay_y=230&overlay_w=200&overlay_h=200`
+        const canvas = createCanvas(template.width, template.height)
+        const ctx = canvas.getContext("2d")
+
+        ctx.drawImage(template, 0, 0)
+
+        const qrData = await QRCode.toDataURL(
+            `https://essnce-qr.vercel.app/validate/${code}`
+        )
+
+        const qr = await loadImage(qrData)
+
+        /* POSICIÓN DEL QR */
+        ctx.drawImage(qr, 330, 230, 200, 200)
+
+        const buffer = canvas.toBuffer("image/png")
 
         await resend.emails.send({
+
             from: "Essnce <onboarding@resend.dev>",
+
             to: email,
+
             subject: "Tu entrada para Essnce",
+
             html: `
-      <div style="background:black;padding:40px;text-align:center">
-        <img src="${ticketImage}" width="420" style="border-radius:10px"/>
-        <p style="color:white;margin-top:20px">
-        Presenta este QR en la entrada
-        </p>
-      </div>
-      `
+<h2>Tu entrada para Essnce</h2>
+<p>Presenta esta entrada en la puerta</p>
+`,
+
+            attachments: [
+                {
+                    filename: "entrada-essnce.png",
+                    content: buffer
+                }
+            ]
+
         })
 
         res.status(200).json({ success: true })
