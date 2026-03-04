@@ -1,68 +1,76 @@
-import { createCanvas, loadImage } from "@napi-rs/canvas"
+import nodemailer from "nodemailer"
 import QRCode from "qrcode"
-import { Resend } from "resend"
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import fs from "fs"
+import path from "path"
+import sharp from "sharp"
 
 export default async function handler(req, res) {
 
     try {
 
-        const { email, code } = req.body
+        const { email, code, name } = req.body
 
-        const template = await loadImage(
-            "https://essnce-qr.vercel.app/ticket-template.jpg"
-        )
+        if (!email || !code) {
+            return res.status(400).json({ success: false })
+        }
 
-        const canvas = createCanvas(template.width, template.height)
-        const ctx = canvas.getContext("2d")
+        /* GENERAR QR */
 
-        ctx.drawImage(template, 0, 0)
+        const qrBuffer = await QRCode.toBuffer(code)
 
-        const qrData = await QRCode.toDataURL(
-            `https://essnce-qr.vercel.app/validate/${code}`
-        )
+        /* CARGAR TEMPLATE */
 
-        const qr = await loadImage(qrData)
+        const templatePath = path.join(process.cwd(), "public", "entrada-essnce.png")
 
-        /* POSICIÓN DEL QR */
-        const qrSize = 440
+        const template = fs.readFileSync(templatePath)
 
-        const x = (template.width / 2) - (qrSize / 2)
-        const y = 309
+        /* CREAR IMAGEN FINAL */
 
-        ctx.drawImage(qr, x, y, qrSize, qrSize)
-
-        const buffer = canvas.toBuffer("image/png")
-
-        await resend.emails.send({
-
-            from: "Essnce <onboarding@resend.dev>",
-
-            to: email,
-
-            subject: "Tu entrada para Essnce",
-
-            html: `
-<h2>Tu entrada para Essnce</h2>
-<p>Presenta esta entrada en la puerta</p>
-`,
-
-            attachments: [
+        const finalImage = await sharp(template)
+            .composite([
                 {
-                    filename: "entrada-essnce.png",
-                    content: buffer
+                    input: qrBuffer,
+                    top: 980,
+                    left: 440,
+                    width: 420,
+                    height: 420
                 }
-            ]
+            ])
+            .png()
+            .toBuffer()
 
+        /* CONFIGURAR EMAIL */
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
         })
 
-        res.status(200).json({ success: true })
+        /* ENVIAR EMAIL */
 
-    } catch (err) {
+        await transporter.sendMail({
+            from: `"ESSNCE" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Tu entrada ESSNCE",
+            html: `<p>Hola ${name || ""}, aquí está tu entrada.</p>`,
+            attachments: [
+                {
+                    filename: "entrada.png",
+                    content: finalImage
+                }
+            ]
+        })
 
-        console.log(err)
-        res.status(500).json({ error: "email failed" })
+        return res.status(200).json({ success: true })
+
+    } catch (error) {
+
+        console.error(error)
+
+        return res.status(500).json({ success: false })
 
     }
 
