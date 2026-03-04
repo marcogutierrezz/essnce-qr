@@ -22,10 +22,15 @@ function Admin() {
         const { data } = await supabase
             .from("tickets")
             .select("*")
-            .order("created_at", { ascending: true })
 
         if (data) setTickets(data)
     }
+
+    const total = tickets.length
+    const registered = tickets.filter(t => t.assigned)
+    const available = tickets.filter(t => !t.assigned)
+    const used = tickets.filter(t => t.used)
+    const paid = tickets.filter(t => t.paid)
 
     async function saveToAvailableTicket() {
 
@@ -56,24 +61,22 @@ function Admin() {
 
         setMessage("✅ Guardado correctamente")
 
-        await fetchTickets()
-
         setForm({
             buyer_name: "",
             email: "",
             paid: false,
             payment_method: ""
         })
+
+        fetchTickets()
     }
 
     async function sendEmailToLastAssigned() {
 
-        const lastAssigned = tickets
-            .filter(t => t.assigned)
-            .slice(-1)[0]
+        const lastAssigned = registered.slice(-1)[0]
 
         if (!lastAssigned || !lastAssigned.email) {
-            setMessage("❌ No hay entrada válida para enviar")
+            setMessage("❌ No hay entrada válida")
             return
         }
 
@@ -96,33 +99,49 @@ function Admin() {
         }
     }
 
-    const registered = tickets.filter(t => t.assigned)
-    const available = tickets.filter(t => !t.assigned)
-
     return (
         <div className="admin-container">
 
             <h1>Panel Admin</h1>
 
+            {/* CONTADOR */}
+            <div className="stats">
+
+                <div className="stat-card">
+                    <h3>{total}</h3>
+                    <p>Total</p>
+                </div>
+
+                <div className="stat-card green">
+                    <h3>{registered.length}</h3>
+                    <p>Registradas</p>
+                </div>
+
+                <div className="stat-card blue">
+                    <h3>{available.length}</h3>
+                    <p>Disponibles</p>
+                </div>
+
+                <div className="stat-card red">
+                    <h3>{used.length}</h3>
+                    <p>Usadas</p>
+                </div>
+
+                <div className="stat-card yellow">
+                    <h3>{paid.length}</h3>
+                    <p>Pagadas</p>
+                </div>
+
+            </div>
+
             <div className="tabs">
-                <button
-                    className={tab === "create" ? "tab active" : "tab"}
-                    onClick={() => setTab("create")}
-                >
+                <button className={tab === "create" ? "tab active" : "tab"} onClick={() => setTab("create")}>
                     Crear
                 </button>
-
-                <button
-                    className={tab === "registered" ? "tab active" : "tab"}
-                    onClick={() => setTab("registered")}
-                >
-                    Registrados
+                <button className={tab === "registered" ? "tab active" : "tab"} onClick={() => setTab("registered")}>
+                    Registradas
                 </button>
-
-                <button
-                    className={tab === "available" ? "tab active" : "tab"}
-                    onClick={() => setTab("available")}
-                >
+                <button className={tab === "available" ? "tab active" : "tab"} onClick={() => setTab("available")}>
                     Disponibles
                 </button>
             </div>
@@ -176,9 +195,7 @@ function Admin() {
                         Enviar Correo
                     </button>
 
-                    {message && (
-                        <p style={{ marginTop: "10px" }}>{message}</p>
-                    )}
+                    {message && <p className="message">{message}</p>}
 
                 </div>
             )}
@@ -189,7 +206,6 @@ function Admin() {
                         <div className="ticket-code">{ticket.code}</div>
                         <p>{ticket.buyer_name}</p>
                         <p>{ticket.email}</p>
-                        <p>{ticket.paid ? "Pagado" : "Pendiente"}</p>
                     </div>
                 ))
             )}

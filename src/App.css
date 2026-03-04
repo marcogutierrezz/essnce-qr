@@ -139,3 +139,44 @@ button {
   }
 
 }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: #1e293b;
+  padding: 16px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.stat-card h3 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.stat-card.green {
+  border-left: 4px solid #22c55e;
+}
+
+.stat-card.blue {
+  border-left: 4px solid #3b82f6;
+}
+
+.stat-card.red {
+  border-left: 4px solid #ef4444;
+}
+
+.stat-card.yellow {
+  border-left: 4px solid #facc15;
+}
+
+@media (min-width: 768px) {
+  .stats {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
