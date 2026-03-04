@@ -141,8 +141,6 @@ function Admin() {
 
         setMessage("")
 
-        /* 1 actualizar ticket */
-
         const { error } = await supabase
             .from("tickets")
             .update({
@@ -159,37 +157,23 @@ function Admin() {
             return
         }
 
-        /* 2 reenviar correo */
-
         if (editingTicket.email) {
 
-            try {
-
-                await fetch("/api/send-ticket", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        email: editingTicket.email,
-                        code: editingTicket.code,
-                        name: editingTicket.buyer_name
-                    })
+            await fetch("/api/send-ticket", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: editingTicket.email,
+                    code: editingTicket.code,
+                    name: editingTicket.buyer_name
                 })
-
-                setMessage(`✅ Entrada reenviada a ${editingTicket.email}`)
-
-            } catch {
-
-                setMessage("⚠ Entrada actualizada pero error enviando correo")
-
-            }
-
-        } else {
-
-            setMessage("⚠ Entrada actualizada pero sin correo")
+            })
 
         }
+
+        setMessage("✅ Entrada actualizada y reenviada")
 
         setEditingTicket(null)
 
@@ -350,79 +334,17 @@ function Admin() {
             </div>
 
 
-            {/* CREATE */}
+            {/* AVAILABLE TAB */}
 
-            {tab === "create" && (
+            {tab === "available" && (
 
-                <div className="ticket-card">
+                available.map(ticket => (
 
-                    <input placeholder="Nombre"
-                        value={form.buyer_name}
-                        onChange={(e) => setForm({ ...form, buyer_name: e.target.value })}
-                    />
-
-                    <input placeholder="Correo"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    />
-
-                    <input type="number" placeholder="Monto pagado"
-                        value={form.amount}
-                        onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                    />
-
-                    <label>
-                        <input type="checkbox"
-                            checked={form.paid}
-                            onChange={(e) => setForm({ ...form, paid: e.target.checked })}
-                        />
-                        Pagado
-                    </label>
-
-                    <select
-                        value={form.payment_method}
-                        onChange={(e) => setForm({ ...form, payment_method: e.target.value })}
-                    >
-                        <option value="">Método</option>
-                        <option value="Efectivo">Efectivo</option>
-                        <option value="Transferencia">Transferencia</option>
-                    </select>
-
-                    <button className="btn-primary" onClick={saveToAvailableTicket}>
-                        Guardar y enviar entrada
-                    </button>
-
-                </div>
-
-            )}
-
-
-            {/* REGISTERED */}
-
-            {tab === "registered" && (
-
-                registered.map(ticket => (
-
-                    <div
-                        key={ticket.id}
-                        className="ticket-card"
-
-                        onMouseDown={handleStart}
-                        onMouseMove={handleMove}
-                        onMouseUp={(e) => handleEnd(e, ticket)}
-
-                        onTouchStart={handleStart}
-                        onTouchMove={handleMove}
-                        onTouchEnd={(e) => handleEnd(e, ticket)}
-                    >
+                    <div key={ticket.id} className="ticket-card">
 
                         <div className="ticket-code">{ticket.code}</div>
-                        <p>{ticket.buyer_name}</p>
-                        <p>{ticket.email}</p>
-                        <p>${ticket.amount}</p>
-                        <p>{ticket.payment_method}</p>
 
-                        <small>← editar | borrar →</small>
+                        <p>Disponible</p>
 
                     </div>
 
@@ -431,55 +353,59 @@ function Admin() {
             )}
 
 
-            {/* EDIT POPUP */}
+            {/* EXPENSES TAB */}
 
-            {editingTicket && (
+            {tab === "expenses" && (
 
-                <div className="edit-overlay">
+                <div>
 
-                    <div className="edit-popup">
-
-                        <h3>Editar Entrada</h3>
+                    <div className="ticket-card">
 
                         <input
-                            value={editingTicket.buyer_name}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, buyer_name: e.target.value })}
+                            placeholder="Nombre admin"
+                            value={expenseForm.admin_name}
+                            onChange={(e) => setExpenseForm({ ...expenseForm, admin_name: e.target.value })}
                         />
 
                         <input
-                            value={editingTicket.email}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, email: e.target.value })}
+                            placeholder="Descripción"
+                            value={expenseForm.description}
+                            onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
                         />
 
                         <input
                             type="number"
-                            value={editingTicket.amount}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, amount: e.target.value })}
+                            placeholder="Monto"
+                            value={expenseForm.amount}
+                            onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
                         />
 
-                        <select
-                            value={editingTicket.payment_method}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, payment_method: e.target.value })}
-                        >
-                            <option value="Efectivo">Efectivo</option>
-                            <option value="Transferencia">Transferencia</option>
-                        </select>
-
-                        <button className="btn-primary" onClick={updateAndResendTicket}>
-                            Guardar y reenviar entrada
-                        </button>
-
-                        <button className="btn-secondary" onClick={() => setEditingTicket(null)}>
-                            Cancelar
+                        <button className="btn-primary" onClick={addExpense}>
+                            Registrar gasto
                         </button>
 
                     </div>
+
+                    {expenses.map(exp => (
+
+                        <div key={exp.id} className="ticket-card">
+
+                            <p><strong>{exp.admin_name}</strong></p>
+
+                            <p>{exp.description}</p>
+
+                            <p>${exp.amount}</p>
+
+                        </div>
+
+                    ))}
 
                 </div>
 
             )}
 
         </div>
+
     )
 }
 
