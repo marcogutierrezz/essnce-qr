@@ -15,10 +15,20 @@ function Admin() {
         const { data, error } = await supabase
             .from("tickets")
             .select("*")
+            .order("created_at", { ascending: true })
 
         if (!error) {
             setTickets(data)
         }
+    }
+
+    async function updateTicket(id, field, value) {
+        await supabase
+            .from("tickets")
+            .update({ [field]: value })
+            .eq("id", id)
+
+        fetchTickets()
     }
 
     function exportToExcel() {
@@ -46,7 +56,7 @@ function Admin() {
                 Exportar a Excel
             </button>
 
-            <table border="1" cellPadding="10" style={{ marginTop: "20px" }}>
+            <table border="1" cellPadding="8" style={{ marginTop: "20px" }}>
                 <thead>
                     <tr>
                         <th>Nombre</th>
@@ -59,10 +69,40 @@ function Admin() {
                 <tbody>
                     {tickets.map(ticket => (
                         <tr key={ticket.id}>
-                            <td>{ticket.buyer_name}</td>
+                            <td>
+                                <input
+                                    value={ticket.buyer_name || ""}
+                                    onChange={(e) =>
+                                        updateTicket(ticket.id, "buyer_name", e.target.value)
+                                    }
+                                />
+                            </td>
+
                             <td>{ticket.code}</td>
-                            <td>{ticket.paid ? "Sí" : "No"}</td>
-                            <td>{ticket.payment_method}</td>
+
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    checked={ticket.paid || false}
+                                    onChange={(e) =>
+                                        updateTicket(ticket.id, "paid", e.target.checked)
+                                    }
+                                />
+                            </td>
+
+                            <td>
+                                <select
+                                    value={ticket.payment_method || ""}
+                                    onChange={(e) =>
+                                        updateTicket(ticket.id, "payment_method", e.target.value)
+                                    }
+                                >
+                                    <option value="">Seleccionar</option>
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Transferencia">Transferencia</option>
+                                </select>
+                            </td>
+
                             <td>{ticket.used ? "Sí" : "No"}</td>
                         </tr>
                     ))}
