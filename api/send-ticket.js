@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
     try {
 
-        const { email, code, name } = req.body
+        const { email, code } = req.body
 
         const qrUrl = await QRCode.toDataURL(
             `https://essnce-qr.vercel.app/validate/${code}`
@@ -23,33 +23,20 @@ export default async function handler(req, res) {
 
             html: `
 
-<div style="
-font-family:Montserrat, sans-serif;
-background:black;
-padding:20px;
-text-align:center;
-">
+<div style="background:#000;padding:40px;text-align:center">
 
-<div style="
-position:relative;
-display:inline-block;
-max-width:400px;
-">
-
-<img
+<img 
 src="https://essnce-qr.vercel.app/ticket-template.jpg"
-style="width:100%;border-radius:10px"
+width="420"
+style="display:block;margin:auto;border-radius:10px"
 />
+
+<div style="margin-top:-420px">
 
 <img
 src="${qrUrl}"
+width="180"
 style="
-position:absolute;
-top:220px;
-left:50%;
-transform:translateX(-50%);
-width:180px;
-height:180px;
 background:white;
 padding:10px;
 border-radius:12px;
@@ -58,8 +45,8 @@ border-radius:12px;
 
 </div>
 
-<p style="margin-top:20px;color:white">
-Presenta este QR en la entrada
+<p style="margin-top:40px;color:white">
+Presenta este código al ingresar
 </p>
 
 </div>
@@ -73,7 +60,6 @@ Presenta este QR en la entrada
     } catch (err) {
 
         console.log(err)
-
         res.status(500).json({ error: "email failed" })
 
     }
