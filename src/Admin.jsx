@@ -5,6 +5,8 @@ function Admin() {
 
     const [tickets, setTickets] = useState([])
     const [tab, setTab] = useState("create")
+    const [message, setMessage] = useState("")
+
     const [form, setForm] = useState({
         buyer_name: "",
         email: "",
@@ -25,52 +27,73 @@ function Admin() {
         if (data) setTickets(data)
     }
 
-    async function createTicket() {
+    async function saveToAvailableTicket() {
 
-        const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase()
+        setMessage("")
 
-        const { data } = await supabase.from("tickets").insert([
-            {
-                code: randomCode,
+        const availableTicket = tickets.find(t => !t.assigned)
+
+        if (!availableTicket) {
+            setMessage("❌ No hay entradas disponibles")
+            return
+        }
+
+        const { error } = await supabase
+            .from("tickets")
+            .update({
                 buyer_name: form.buyer_name,
                 email: form.email,
                 paid: form.paid,
                 payment_method: form.payment_method,
-                assigned: true,
-                used: false
-            }
-        ]).select()
-
-        if (data) {
-            setForm({
-                buyer_name: "",
-                email: "",
-                paid: false,
-                payment_method: ""
+                assigned: true
             })
-            fetchTickets()
-            alert("Entrada creada")
-        }
-    }
+            .eq("id", availableTicket.id)
 
-    async function sendEmail(ticket) {
-
-        if (!ticket.email) {
-            alert("No tiene correo")
+        if (error) {
+            setMessage("❌ Error al guardar")
             return
         }
 
-        await fetch("/api/send-ticket", {
+        setMessage("✅ Guardado correctamente")
+
+        await fetchTickets()
+
+        setForm({
+            buyer_name: "",
+            email: "",
+            paid: false,
+            payment_method: ""
+        })
+    }
+
+    async function sendEmailToLastAssigned() {
+
+        const lastAssigned = tickets
+            .filter(t => t.assigned)
+            .slice(-1)[0]
+
+        if (!lastAssigned || !lastAssigned.email) {
+            setMessage("❌ No hay entrada válida para enviar")
+            return
+        }
+
+        const response = await fetch("/api/send-ticket", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                email: ticket.email,
-                code: ticket.code,
-                name: ticket.buyer_name
+                email: lastAssigned.email,
+                code: lastAssigned.code,
+                name: lastAssigned.buyer_name
             })
         })
 
-        alert("Correo enviado")
+        const result = await response.json()
+
+        if (result.success) {
+            setMessage("✅ Correo enviado correctamente")
+        } else {
+            setMessage("❌ Error al enviar correo")
+        }
     }
 
     const registered = tickets.filter(t => t.assigned)
@@ -82,13 +105,24 @@ function Admin() {
             <h1>Panel Admin</h1>
 
             <div className="tabs">
-                <button className={tab === "create" ? "tab active" : "tab"} onClick={() => setTab("create")}>
+                <button
+                    className={tab === "create" ? "tab active" : "tab"}
+                    onClick={() => setTab("create")}
+                >
                     Crear
                 </button>
-                <button className={tab === "registered" ? "tab active" : "tab"} onClick={() => setTab("registered")}>
+
+                <button
+                    className={tab === "registered" ? "tab active" : "tab"}
+                    onClick={() => setTab("registered")}
+                >
                     Registrados
                 </button>
-                <button className={tab === "available" ? "tab active" : "tab"} onClick={() => setTab("available")}>
+
+                <button
+                    className={tab === "available" ? "tab active" : "tab"}
+                    onClick={() => setTab("available")}
+                >
                     Disponibles
                 </button>
             </div>
@@ -99,36 +133,52 @@ function Admin() {
                     <input
                         placeholder="Nombre"
                         value={form.buyer_name}
-                        onChange={(e) => setForm({ ...form, buyer_name: e.target.value })}
+                        onChange={(e) =>
+                            setForm({ ...form, buyer_name: e.target.value })
+                        }
                     />
 
                     <input
                         placeholder="Correo"
                         value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                        onChange={(e) =>
+                            setForm({ ...form, email: e.target.value })
+                        }
                     />
 
                     <label>
                         <input
                             type="checkbox"
                             checked={form.paid}
-                            onChange={(e) => setForm({ ...form, paid: e.target.checked })}
+                            onChange={(e) =>
+                                setForm({ ...form, paid: e.target.checked })
+                            }
                         />
                         Pagado
                     </label>
 
                     <select
                         value={form.payment_method}
-                        onChange={(e) => setForm({ ...form, payment_method: e.target.value })}
+                        onChange={(e) =>
+                            setForm({ ...form, payment_method: e.target.value })
+                        }
                     >
                         <option value="">Método</option>
                         <option value="Efectivo">Efectivo</option>
                         <option value="Transferencia">Transferencia</option>
                     </select>
 
-                    <button onClick={createTicket}>
-                        Guardar Entrada
+                    <button onClick={saveToAvailableTicket}>
+                        Guardar
                     </button>
+
+                    <button onClick={sendEmailToLastAssigned}>
+                        Enviar Correo
+                    </button>
+
+                    {message && (
+                        <p style={{ marginTop: "10px" }}>{message}</p>
+                    )}
 
                 </div>
             )}
@@ -140,7 +190,6 @@ function Admin() {
                         <p>{ticket.buyer_name}</p>
                         <p>{ticket.email}</p>
                         <p>{ticket.paid ? "Pagado" : "Pendiente"}</p>
-                        <button onClick={() => sendEmail(ticket)}>Reenviar</button>
                     </div>
                 ))
             )}
