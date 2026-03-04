@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         const qrSize = 440
 
         const x = (template.width / 2) - (qrSize / 2)
-        const y = 305
+        const y = 309
 
         ctx.drawImage(qr, x, y, qrSize, qrSize)
 
