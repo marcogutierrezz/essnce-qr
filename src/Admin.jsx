@@ -159,85 +159,6 @@ function Admin() {
             return
         }
 
-        {/* AVAILABLE */ }
-
-        {
-            tab === "available" && (
-
-                available.map(ticket => (
-
-                    <div key={ticket.id} className="ticket-card">
-
-                        <div className="ticket-code">{ticket.code}</div>
-
-                        <p>Disponible</p>
-
-                    </div>
-
-                ))
-
-            )
-        }
-
-        {/* EXPENSES */ }
-
-        {
-            tab === "expenses" && (
-
-                <div>
-
-                    <div className="ticket-card">
-
-                        <input
-                            placeholder="Nombre admin"
-                            value={expenseForm.admin_name}
-                            onChange={(e) =>
-                                setExpenseForm({ ...expenseForm, admin_name: e.target.value })
-                            }
-                        />
-
-                        <input
-                            placeholder="Descripción"
-                            value={expenseForm.description}
-                            onChange={(e) =>
-                                setExpenseForm({ ...expenseForm, description: e.target.value })
-                            }
-                        />
-
-                        <input
-                            type="number"
-                            placeholder="Monto"
-                            value={expenseForm.amount}
-                            onChange={(e) =>
-                                setExpenseForm({ ...expenseForm, amount: e.target.value })
-                            }
-                        />
-
-                        <button className="btn-primary" onClick={addExpense}>
-                            Registrar gasto
-                        </button>
-
-                    </div>
-
-                    {expenses.map(exp => (
-
-                        <div key={exp.id} className="ticket-card">
-
-                            <p><strong>{exp.admin_name}</strong></p>
-
-                            <p>{exp.description}</p>
-
-                            <p>${exp.amount}</p>
-
-                        </div>
-
-                    ))}
-
-                </div>
-
-            )
-        }
-
         /* 2 reenviar correo */
 
         if (editingTicket.email) {
@@ -506,6 +427,81 @@ function Admin() {
                     </div>
 
                 ))
+
+            )}
+
+            {/* AVAILABLE */}
+
+            {tab === "available" && (
+
+                available.map(ticket => (
+
+                    <div key={ticket.id} className="ticket-card">
+
+                        <div className="ticket-code">{ticket.code}</div>
+
+                        <p>Disponible</p>
+
+                    </div>
+
+                ))
+
+            )}
+
+            {/* EXPENSES */}
+
+            {tab === "expenses" && (
+
+                <div>
+
+                    <div className="ticket-card">
+
+                        <input
+                            placeholder="Nombre admin"
+                            value={expenseForm.admin_name}
+                            onChange={(e) =>
+                                setExpenseForm({ ...expenseForm, admin_name: e.target.value })
+                            }
+                        />
+
+                        <input
+                            placeholder="Descripción"
+                            value={expenseForm.description}
+                            onChange={(e) =>
+                                setExpenseForm({ ...expenseForm, description: e.target.value })
+                            }
+                        />
+
+                        <input
+                            type="number"
+                            placeholder="Monto"
+                            value={expenseForm.amount}
+                            onChange={(e) =>
+                                setExpenseForm({ ...expenseForm, amount: e.target.value })
+                            }
+                        />
+
+                        <button className="btn-primary" onClick={addExpense}>
+                            Registrar gasto
+                        </button>
+
+                    </div>
+
+                    {expenses.map(exp => (
+
+                        <div key={exp.id} className="ticket-card">
+
+                            <p><strong>{exp.admin_name}</strong></p>
+
+                            <p>{exp.description}</p>
+
+                            <p>${exp.amount}</p>
+
+                        </div>
+
+                    ))}
+
+                </div>
 
             )}
 
