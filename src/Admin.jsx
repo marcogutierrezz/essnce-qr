@@ -139,7 +139,9 @@ function Admin() {
 
     async function updateAndResendTicket() {
 
-        await supabase
+        setMessage("")
+
+        const { error } = await supabase
             .from("tickets")
             .update({
                 buyer_name: editingTicket.buyer_name,
@@ -150,25 +152,45 @@ function Admin() {
             })
             .eq("id", editingTicket.id)
 
-        if (editingTicket.email) {
-
-            await fetch("/api/send-ticket", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: editingTicket.email,
-                    code: editingTicket.code,
-                    name: editingTicket.buyer_name
-                })
-            })
-
+        if (error) {
+            setMessage("❌ Error actualizando entrada")
+            return
         }
 
-        setMessage("✅ Entrada actualizada y reenviada")
+        if (editingTicket.email) {
+
+            try {
+
+                const response = await fetch("/api/send-ticket", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: editingTicket.email,
+                        code: editingTicket.code,
+                        name: editingTicket.buyer_name
+                    })
+                })
+
+                const result = await response.json()
+
+                if (result.success) {
+                    setMessage(`✅ Entrada reenviada a ${editingTicket.email}`)
+                } else {
+                    setMessage("⚠ Entrada actualizada pero error enviando correo")
+                }
+
+            } catch {
+                setMessage("⚠ Entrada actualizada pero error enviando correo")
+            }
+
+        }
 
         setEditingTicket(null)
 
         fetchTickets()
+
     }
 
 
