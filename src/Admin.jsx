@@ -4,7 +4,13 @@ import { supabase } from "./supabaseClient"
 function Admin() {
 
     const [tickets, setTickets] = useState([])
-    const [tab, setTab] = useState("pending")
+    const [tab, setTab] = useState("create")
+    const [form, setForm] = useState({
+        buyer_name: "",
+        email: "",
+        paid: false,
+        payment_method: ""
+    })
 
     useEffect(() => {
         fetchTickets()
@@ -23,102 +29,130 @@ function Admin() {
 
         const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase()
 
-        await supabase.from("tickets").insert([
+        const { data } = await supabase.from("tickets").insert([
             {
                 code: randomCode,
-                used: false,
-                paid: false,
-                assigned: false
+                buyer_name: form.buyer_name,
+                email: form.email,
+                paid: form.paid,
+                payment_method: form.payment_method,
+                assigned: true,
+                used: false
             }
-        ])
+        ]).select()
 
-        fetchTickets()
+        if (data) {
+            setForm({
+                buyer_name: "",
+                email: "",
+                paid: false,
+                payment_method: ""
+            })
+            fetchTickets()
+            alert("Entrada creada")
+        }
     }
 
-    function handleChange(id, field, value) {
-        setTickets(prev =>
-            prev.map(ticket =>
-                ticket.id === id ? { ...ticket, [field]: value } : ticket
-            )
-        )
+    async function sendEmail(ticket) {
+
+        if (!ticket.email) {
+            alert("No tiene correo")
+            return
+        }
+
+        await fetch("/api/send-ticket", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: ticket.email,
+                code: ticket.code,
+                name: ticket.buyer_name
+            })
+        })
+
+        alert("Correo enviado")
     }
 
-    async function save(ticket) {
-        await supabase
-            .from("tickets")
-            .update(ticket)
-            .eq("id", ticket.id)
-
-        fetchTickets()
-    }
-
-    const filtered =
-        tab === "pending"
-            ? tickets.filter(t => !t.assigned)
-            : tickets.filter(t => t.assigned)
+    const registered = tickets.filter(t => t.assigned)
+    const available = tickets.filter(t => !t.assigned)
 
     return (
         <div className="admin-container">
 
-            <div className="admin-top">
-                <h1>Panel Admin</h1>
-                <button onClick={createTicket}>+ Nueva Entrada</button>
-            </div>
+            <h1>Panel Admin</h1>
 
             <div className="tabs">
-                <button
-                    className={tab === "pending" ? "tab active" : "tab"}
-                    onClick={() => setTab("pending")}
-                >
-                    Pendientes
+                <button className={tab === "create" ? "tab active" : "tab"} onClick={() => setTab("create")}>
+                    Crear
                 </button>
-
-                <button
-                    className={tab === "assigned" ? "tab active" : "tab"}
-                    onClick={() => setTab("assigned")}
-                >
-                    Asignadas
+                <button className={tab === "registered" ? "tab active" : "tab"} onClick={() => setTab("registered")}>
+                    Registrados
+                </button>
+                <button className={tab === "available" ? "tab active" : "tab"} onClick={() => setTab("available")}>
+                    Disponibles
                 </button>
             </div>
 
-            {filtered.map(ticket => (
-                <div key={ticket.id} className="ticket-card">
-
-                    <div className="ticket-code">{ticket.code}</div>
+            {tab === "create" && (
+                <div className="ticket-card">
 
                     <input
                         placeholder="Nombre"
-                        value={ticket.buyer_name || ""}
-                        onChange={(e) =>
-                            handleChange(ticket.id, "buyer_name", e.target.value)
-                        }
+                        value={form.buyer_name}
+                        onChange={(e) => setForm({ ...form, buyer_name: e.target.value })}
                     />
 
                     <input
                         placeholder="Correo"
-                        value={ticket.email || ""}
-                        onChange={(e) =>
-                            handleChange(ticket.id, "email", e.target.value)
-                        }
+                        value={form.email}
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
                     />
 
                     <label>
                         <input
                             type="checkbox"
-                            checked={ticket.paid || false}
-                            onChange={(e) =>
-                                handleChange(ticket.id, "paid", e.target.checked)
-                            }
+                            checked={form.paid}
+                            onChange={(e) => setForm({ ...form, paid: e.target.checked })}
                         />
                         Pagado
                     </label>
 
-                    <button onClick={() => save(ticket)}>
-                        Guardar
+                    <select
+                        value={form.payment_method}
+                        onChange={(e) => setForm({ ...form, payment_method: e.target.value })}
+                    >
+                        <option value="">Método</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+
+                    <button onClick={createTicket}>
+                        Guardar Entrada
                     </button>
 
                 </div>
-            ))}
+            )}
+
+            {tab === "registered" && (
+                registered.map(ticket => (
+                    <div key={ticket.id} className="ticket-card">
+                        <div className="ticket-code">{ticket.code}</div>
+                        <p>{ticket.buyer_name}</p>
+                        <p>{ticket.email}</p>
+                        <p>{ticket.paid ? "Pagado" : "Pendiente"}</p>
+                        <button onClick={() => sendEmail(ticket)}>Reenviar</button>
+                    </div>
+                ))
+            )}
+
+            {tab === "available" && (
+                available.map(ticket => (
+                    <div key={ticket.id} className="ticket-card">
+                        <div className="ticket-code">{ticket.code}</div>
+                        <p>Disponible</p>
+                    </div>
+                ))
+            )}
 
         </div>
     )

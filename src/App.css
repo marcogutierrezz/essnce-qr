@@ -1,24 +1,23 @@
-body {
+* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   background: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   color: white;
 }
 
+/* NAVBAR */
+
 .navbar {
-  position: sticky;
-  top: 0;
   background: #111827;
-  padding: 14px 20px;
+  padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 100;
-}
-
-.logo {
-  font-weight: bold;
-  font-size: 18px;
 }
 
 .nav-links {
@@ -36,14 +35,10 @@ body {
   font-weight: bold;
 }
 
-.admin-container {
-  padding: 20px;
-}
+/* ADMIN */
 
-.admin-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.admin-container {
+  padding: 16px;
 }
 
 .tabs {
@@ -66,9 +61,9 @@ body {
 
 .ticket-card {
   background: #1e293b;
-  padding: 15px;
+  padding: 16px;
   border-radius: 14px;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -76,40 +71,49 @@ body {
 
 .ticket-code {
   font-weight: bold;
+  font-size: 18px;
   color: #38bdf8;
 }
 
-input {
-  padding: 10px;
+input,
+select {
+  padding: 12px;
   border-radius: 8px;
   border: none;
+  font-size: 16px;
 }
 
 button {
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   border: none;
   background: #6366f1;
   color: white;
   font-weight: 600;
+  cursor: pointer;
 }
 
-.scan-container {
-  padding: 20px;
+/* SCAN */
+
+.scan-wrapper {
+  position: relative;
 }
 
 #reader {
   width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .scan-overlay {
   position: fixed;
   inset: 0;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  z-index: 999;
 }
 
 .scan-overlay.valid {
@@ -119,4 +123,19 @@ button {
 
 .scan-overlay.invalid {
   background: #ff1744;
+}
+
+/* DESKTOP */
+
+@media (min-width: 768px) {
+
+  .admin-container {
+    max-width: 900px;
+    margin: auto;
+  }
+
+  .ticket-card {
+    padding: 24px;
+  }
+
 }
