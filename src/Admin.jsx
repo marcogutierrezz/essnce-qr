@@ -163,6 +163,9 @@ function Admin() {
 
             try {
 
+                console.log("REENVIANDO A:", data.email)
+                console.log("CODE:", data.code)
+
                 const response = await fetch("/api/send-ticket", {
                     method: "POST",
                     headers: {
