@@ -180,3 +180,77 @@ button {
     grid-template-columns: repeat(5, 1fr);
   }
 }
+
+/* HOME */
+
+.home-container {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.home-center {
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.home-title {
+  font-size: 36px;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+}
+
+.home-subtitle {
+  color: #94a3b8;
+  margin-bottom: 40px;
+}
+
+.home-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.home-btn {
+  padding: 18px;
+  font-size: 18px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.home-btn.scan {
+  background: #22c55e;
+  color: black;
+}
+
+.home-btn.admin {
+  background: #6366f1;
+  color: white;
+}
+
+.home-btn:hover {
+  transform: scale(1.03);
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+
+  .home-title {
+    font-size: 48px;
+  }
+
+  .home-buttons {
+    flex-direction: row;
+  }
+
+  .home-btn {
+    flex: 1;
+  }
+
+}
