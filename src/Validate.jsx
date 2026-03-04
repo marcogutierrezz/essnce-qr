@@ -40,15 +40,16 @@ function Validate() {
 
     if (status === "valid") {
         return (
-            <div style={{ background: "green", color: "white", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ background: "#00ff88", color: "white", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <h1>ENTRADA VÁLIDA</h1>
+                <h2 style={{ fontSize: "30px" }}>BIENVENIDO A ESSNCE</h2>
             </div>
         )
     }
 
     if (status === "invalid_or_used") {
         return (
-            <div style={{ background: "red", color: "white", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ background: "#ff0033", color: "white", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <h1>ENTRADA INVÁLIDA O YA USADA</h1>
             </div>
         )

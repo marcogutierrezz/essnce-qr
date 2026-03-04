@@ -3,6 +3,7 @@ import Home from './Home'
 import Validate from './Validate'
 import Scan from './Scan'
 import Admin from './Admin'
+import GenerateQR from './GenerateQR'
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Route path="/validate/:code" element={<Validate />} />
       <Route path="/scan" element={<Scan />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/generate-qr" element={<GenerateQR />} />
     </Routes>
   )
 }
