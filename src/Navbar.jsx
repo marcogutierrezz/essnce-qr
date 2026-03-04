@@ -1,43 +1,37 @@
-import { Link, useLocation } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 function Navbar() {
 
-    const location = useLocation()
+    const navigate = useNavigate()
 
     return (
+
         <div className="navbar">
 
-            <div className="logo">
+            <div
+                className="nav-logo"
+                onClick={() => navigate("/")}
+                style={{ cursor: "pointer" }}
+            >
                 ESSNCE
             </div>
 
             <div className="nav-links">
 
-                <Link
-                    to="/"
-                    className={location.pathname === "/" ? "nav-item active" : "nav-item"}
-                >
-                    Inicio
-                </Link>
+                <button onClick={() => navigate("/scan")}>
+                    Scan
+                </button>
 
-                <Link
-                    to="/scan"
-                    className={location.pathname === "/scan" ? "nav-item active" : "nav-item"}
-                >
-                    Escanear
-                </Link>
-
-                <Link
-                    to="/admin"
-                    className={location.pathname === "/admin" ? "nav-item active" : "nav-item"}
-                >
+                <button onClick={() => navigate("/admin")}>
                     Admin
-                </Link>
+                </button>
 
             </div>
 
         </div>
+
     )
+
 }
 
 export default Navbar
