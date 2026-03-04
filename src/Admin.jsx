@@ -141,6 +141,8 @@ function Admin() {
 
         setMessage("")
 
+        /* 1 actualizar ticket */
+
         const { error } = await supabase
             .from("tickets")
             .update({
@@ -157,11 +159,13 @@ function Admin() {
             return
         }
 
+        /* 2 reenviar correo */
+
         if (editingTicket.email) {
 
             try {
 
-                const response = await fetch("/api/send-ticket", {
+                await fetch("/api/send-ticket", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -173,17 +177,17 @@ function Admin() {
                     })
                 })
 
-                const result = await response.json()
-
-                if (result.success) {
-                    setMessage(`✅ Entrada reenviada a ${editingTicket.email}`)
-                } else {
-                    setMessage("⚠ Entrada actualizada pero error enviando correo")
-                }
+                setMessage(`✅ Entrada reenviada a ${editingTicket.email}`)
 
             } catch {
+
                 setMessage("⚠ Entrada actualizada pero error enviando correo")
+
             }
+
+        } else {
+
+            setMessage("⚠ Entrada actualizada pero sin correo")
 
         }
 
