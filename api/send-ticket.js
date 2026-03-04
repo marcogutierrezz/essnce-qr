@@ -1,8 +1,14 @@
 import { createCanvas, loadImage } from "@napi-rs/canvas"
 import QRCode from "qrcode"
 import { Resend } from "resend"
+import { createClient } from "@supabase/supabase-js"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+)
 
 export default async function handler(req, res) {
 
@@ -55,6 +61,15 @@ export default async function handler(req, res) {
                 }
             ]
         })
+
+        /* REGISTRO DE ENVIO */
+
+        await supabase
+            .from("ticket_email_logs")
+            .insert({
+                ticket_code: code,
+                sent_to: email
+            })
 
         res.status(200).json({ success: true })
 

@@ -279,6 +279,40 @@ function Admin() {
         fetchExpenses()
     }
 
+    async function resendTicket(ticket) {
+
+        const newEmail = prompt("Ingrese el nuevo correo")
+
+        if (!newEmail) return
+
+        setMessage("Enviando entrada...")
+
+        try {
+
+            const response = await fetch("/api/send-ticket", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: newEmail,
+                    code: ticket.code,
+                    name: ticket.buyer_name
+                })
+            })
+
+            if (!response.ok) throw new Error()
+
+            setMessage(`✅ Entrada reenviada a ${newEmail}`)
+
+        } catch {
+
+            setMessage("❌ Error reenviando entrada")
+
+        }
+
+    }
+
 
     return (
 
@@ -425,6 +459,13 @@ function Admin() {
                         <p>{ticket.payment_method}</p>
 
                         <small>← editar | borrar →</small>
+
+                        <button
+                            className="btn-secondary"
+                            onClick={() => resendTicket(ticket)}
+                        >
+                            Reenviar entrada
+                        </button>
 
                     </div>
 
