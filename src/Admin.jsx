@@ -45,13 +45,13 @@ function Admin() {
             })
             .eq("id", ticket.id)
 
-        alert("Guardado correctamente")
+        alert("Guardado")
     }
 
     async function sendEmail(ticket) {
 
         if (!ticket.email) {
-            alert("Debes agregar un correo primero")
+            alert("Agrega correo")
             return
         }
 
@@ -73,7 +73,6 @@ function Admin() {
         alert("Entrada enviada")
     }
 
-    // 🔥 ESTA ES LA FUNCIÓN QUE FALTABA
     function exportToExcel() {
 
         const dataToExport = tickets.map(ticket => ({
@@ -102,98 +101,78 @@ function Admin() {
     }
 
     return (
-        <div className="container">
+        <div className="admin-wrapper">
 
-            <div className="card">
-                <h1>Panel Admin Essnce</h1>
-
-                <div style={{ marginBottom: "20px", display: "flex", gap: "15px" }}>
-                    <button onClick={exportToExcel}>
-                        Exportar Excel
-                    </button>
-
+            <div className="admin-header">
+                <h1>ESSNCE ADMIN</h1>
+                <div className="admin-actions">
+                    <button onClick={exportToExcel}>Exportar</button>
                     <button onClick={() => setShowUnassigned(!showUnassigned)}>
-                        {showUnassigned ? "Ver Todos" : "Ver No Asignados"}
+                        {showUnassigned ? "Todos" : "No asignados"}
                     </button>
                 </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Código</th>
-                            <th>Pagado</th>
-                            <th>Método</th>
-                            <th>Usado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tickets.map(ticket => (
-                            <tr key={ticket.id}>
-
-                                <td>
-                                    <input
-                                        value={ticket.buyer_name || ""}
-                                        onChange={(e) =>
-                                            handleLocalChange(ticket.id, "buyer_name", e.target.value)
-                                        }
-                                    />
-                                </td>
-
-                                <td>
-                                    <input
-                                        value={ticket.email || ""}
-                                        onChange={(e) =>
-                                            handleLocalChange(ticket.id, "email", e.target.value)
-                                        }
-                                    />
-                                </td>
-
-                                <td>{ticket.code}</td>
-
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        checked={ticket.paid || false}
-                                        onChange={(e) =>
-                                            handleLocalChange(ticket.id, "paid", e.target.checked)
-                                        }
-                                    />
-                                </td>
-
-                                <td>
-                                    <select
-                                        value={ticket.payment_method || ""}
-                                        onChange={(e) =>
-                                            handleLocalChange(ticket.id, "payment_method", e.target.value)
-                                        }
-                                    >
-                                        <option value="">Seleccionar</option>
-                                        <option value="Efectivo">Efectivo</option>
-                                        <option value="Transferencia">Transferencia</option>
-                                    </select>
-                                </td>
-
-                                <td>{ticket.used ? "Sí" : "No"}</td>
-
-                                <td>
-                                    <button onClick={() => saveTicket(ticket)}>
-                                        Guardar
-                                    </button>
-
-                                    <button onClick={() => sendEmail(ticket)}>
-                                        Enviar
-                                    </button>
-                                </td>
-
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
             </div>
+
+            {tickets.map(ticket => (
+                <div key={ticket.id} className="ticket-card">
+
+                    <div className="ticket-code">
+                        {ticket.code}
+                    </div>
+
+                    <input
+                        placeholder="Nombre"
+                        value={ticket.buyer_name || ""}
+                        onChange={(e) =>
+                            handleLocalChange(ticket.id, "buyer_name", e.target.value)
+                        }
+                    />
+
+                    <input
+                        placeholder="Correo"
+                        value={ticket.email || ""}
+                        onChange={(e) =>
+                            handleLocalChange(ticket.id, "email", e.target.value)
+                        }
+                    />
+
+                    <div className="row">
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={ticket.paid || false}
+                                onChange={(e) =>
+                                    handleLocalChange(ticket.id, "paid", e.target.checked)
+                                }
+                            />
+                            Pagado
+                        </label>
+
+                        <select
+                            value={ticket.payment_method || ""}
+                            onChange={(e) =>
+                                handleLocalChange(ticket.id, "payment_method", e.target.value)
+                            }
+                        >
+                            <option value="">Método</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
+                    </div>
+
+                    <div className="row">
+                        <button onClick={() => saveTicket(ticket)}>
+                            Guardar
+                        </button>
+
+                        <button onClick={() => sendEmail(ticket)}>
+                            Enviar
+                        </button>
+                    </div>
+
+                </div>
+            ))}
+
         </div>
     )
 }
