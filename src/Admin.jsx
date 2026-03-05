@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { supabase } from "./supabaseClient"
 import jsPDF from "jspdf"
+import QRCode from "qrcode"
 
 function Admin() {
 
@@ -221,32 +222,27 @@ function Admin() {
    GENERAR PDF
 ----------------------------*/
 
-    function downloadTicketPDF(ticket) {
+    async function downloadTicketPDF(ticket) {
 
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "px",
-            format: [400, 700]
+            format: [540, 960]
         })
 
-        pdf.setFillColor(10, 10, 10)
-        pdf.rect(0, 0, 400, 700, "F")
+        const img = "/ticket-template.jpg"
 
-        pdf.setTextColor(255, 255, 255)
+        pdf.addImage(img, "JPEG", 0, 0, 540, 960)
 
-        pdf.setFontSize(30)
-        pdf.text("ESSNCE", 200, 80, { align: "center" })
+        const qrData = await QRCode.toDataURL(
+            `${window.location.origin}/validate/${ticket.code}`
+        )
 
-        pdf.setFontSize(16)
-        pdf.text(`Ticket #${ticket.id}`, 200, 120, { align: "center" })
+        const qrSize = 440
+        const x = (template.width / 2) - (qrSize / 2)
+        const y = 309
 
-        pdf.setFontSize(14)
-        pdf.text(ticket.buyer_name, 200, 160, { align: "center" })
-
-        pdf.setFontSize(12)
-        pdf.text("Escanea el QR al entrar", 200, 200, { align: "center" })
-
-        pdf.text(`Código: ${ticket.code}`, 200, 240, { align: "center" })
+        pdf.addImage(qrData, "PNG", x, y, qrSize, qrSize)
 
         pdf.save(`ticket-${ticket.id}.pdf`)
     }
