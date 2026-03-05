@@ -8,7 +8,11 @@ export default async function handler(req, res) {
 
     try {
 
-        const { email, code } = req.body
+        const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body
+
+        const { email, code } = body
+
+        console.log("Sending ticket to:", email)
 
         const template = await loadImage(
             "https://essnce-qr.vercel.app/ticket-template.jpg"
