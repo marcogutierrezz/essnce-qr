@@ -230,16 +230,21 @@ function Admin() {
             format: [540, 960]
         })
 
-        const template = "/ticket-template.jpg"
+        const img = new Image()
+        img.src = "/ticket-template.jpg"
 
-        pdf.addImage(template, "JPEG", 0, 0, 540, 960)
+        await new Promise((resolve) => {
+            img.onload = resolve
+        })
+
+        pdf.addImage(img, "JPEG", 0, 0, 540, 960)
 
         const qrData = await QRCode.toDataURL(
             `${window.location.origin}/validate/${ticket.code}`
         )
 
         const qrSize = 440
-        const x = (template.width / 2) - (qrSize / 2)
+        const x = (540 / 2) - (qrSize / 2)
         const y = 309
 
         pdf.addImage(qrData, "PNG", x, y, qrSize, qrSize)
