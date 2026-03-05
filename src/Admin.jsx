@@ -243,9 +243,9 @@ function Admin() {
             `${window.location.origin}/validate/${ticket.code}`
         )
 
-        const qrSize = 300
+        const qrSize = 220
         const x = (540 / 2) - (qrSize / 2)
-        const y = 240
+        const y = 309
 
         pdf.addImage(qrData, "PNG", x, y, qrSize, qrSize)
 
