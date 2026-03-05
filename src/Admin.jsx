@@ -279,50 +279,6 @@ function Admin() {
         fetchExpenses()
     }
 
-    async function resendTicket(ticket) {
-
-        const newEmail = prompt("Ingrese el nuevo correo")
-
-        if (!newEmail) return
-
-        setMessage("Enviando entrada...")
-
-        try {
-
-            const { data, error } = await supabase
-                .from("tickets")
-                .update({ email: newEmail })
-                .eq("id", ticket.id)
-                .select()
-                .single()
-
-            if (error) throw error
-
-            const response = await fetch("/api/send-ticket", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: data.email,
-                    code: data.code
-                })
-            })
-
-            if (!response.ok) throw new Error()
-
-            setMessage(`✅ Entrada reenviada a ${data.email}`)
-
-            fetchTickets()
-
-        } catch (err) {
-
-            console.log(err)
-            setMessage("❌ Error reenviando entrada")
-
-        }
-
-    }
 
 
     return (
