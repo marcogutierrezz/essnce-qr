@@ -245,7 +245,7 @@ function Admin() {
 
         const qrSize = 220
         const x = (540 / 2) - (qrSize / 2)
-        const y = 200
+        const y = 150
 
         pdf.addImage(qrData, "PNG", x, y, qrSize, qrSize)
 
