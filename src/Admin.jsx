@@ -289,10 +289,14 @@ function Admin() {
 
         try {
 
-            await supabase
+            const { data, error } = await supabase
                 .from("tickets")
                 .update({ email: newEmail })
                 .eq("id", ticket.id)
+                .select()
+                .single()
+
+            if (error) throw error
 
             const response = await fetch("/api/send-ticket", {
                 method: "POST",
@@ -300,20 +304,20 @@ function Admin() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    email: newEmail,
-                    code: ticket.code,
-                    name: ticket.buyer_name
+                    email: data.email,
+                    code: data.code
                 })
             })
 
             if (!response.ok) throw new Error()
 
-            setMessage(`✅ Entrada reenviada a ${newEmail}`)
+            setMessage(`✅ Entrada reenviada a ${data.email}`)
 
             fetchTickets()
 
-        } catch {
+        } catch (err) {
 
+            console.log(err)
             setMessage("❌ Error reenviando entrada")
 
         }
