@@ -44,8 +44,46 @@ export default async function handler(req, res) {
             subject: "Tu entrada para Essnce",
 
             html: `
-<h2>Tu entrada para Essnce</h2>
-<p>Presenta esta entrada en la puerta</p>
+<div style="font-family: Arial, Helvetica, sans-serif; background:#f4f4f4; padding:40px">
+
+    <div style="max-width:520px; margin:auto; background:white; border-radius:12px; padding:35px; text-align:center">
+
+        <h1 style="margin:0; color:#111; font-size:28px;">
+            🎟️ Entrada Confirmada
+        </h1>
+
+        <p style="margin-top:20px; font-size:16px; color:#444;">
+            Tu entrada para <strong>Essnce</strong> ha sido registrada correctamente.
+        </p>
+
+        <p style="color:#666; margin-top:10px;">
+            Presenta el código QR adjunto en puerta para ingresar.
+        </p>
+
+        <div style="
+            margin-top:25px;
+            background:#111;
+            color:white;
+            padding:14px 18px;
+            border-radius:8px;
+            font-size:18px;
+            letter-spacing:2px;
+            display:inline-block;
+        ">
+            Código: ${code}
+        </div>
+
+        <p style="margin-top:25px; color:#777; font-size:14px;">
+            Tu ticket está adjunto en este correo.  
+            Puedes guardarlo o mostrarlo directamente desde tu teléfono.
+        </p>
+
+        <hr style="margin:30px 0; border:none; border-top:1px solid #eee;">
+
+
+    </div>
+
+</div>
 `,
 
             attachments: [
