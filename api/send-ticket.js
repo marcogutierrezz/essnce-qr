@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     try {
 
-        const { email, code } = req.body
+        const { email, code, name } = req.body
 
         const template = await loadImage(
             "https://essnce-qr.vercel.app/ticket-template.jpg"
@@ -75,12 +75,20 @@ export default async function handler(req, res) {
         "></div>
 
         <p style="
-            font-size:16px;
-            color:#ccc;
-            line-height:1.6;
-        ">
-            Tu entrada para <strong>Essnce 3.1</strong> ha sido registrada correctamente.
-        </p>
+    font-size:16px;
+    color:#ccc;
+    line-height:1.6;
+">
+    Hola <strong>${name}</strong>,
+</p>
+
+<p style="
+    font-size:16px;
+    color:#ccc;
+    line-height:1.6;
+">
+    Tu entrada para <strong>Essnce 3.1</strong> ha sido registrada correctamente.
+</p>
 
         <p style="
             font-size:15px;
