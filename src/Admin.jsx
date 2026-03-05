@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import { supabase } from "./supabaseClient"
+import jsPDF from "jspdf"
 
 function Admin() {
 
@@ -18,7 +19,8 @@ function Admin() {
         email: "",
         paid: false,
         payment_method: "",
-        amount: ""
+        amount: "",
+        quantity: 1
     })
 
     const [expenseForm, setExpenseForm] = useState({
@@ -153,42 +155,32 @@ function Admin() {
 
         setMessage("")
 
-        const availableTicket = tickets.find(t => !t.assigned)
+        const qty = form.quantity || 1
 
-        if (!availableTicket) {
-            setMessage("❌ No hay entradas disponibles")
+        const availableTickets = tickets.filter(t => !t.assigned).slice(0, qty)
+
+        if (availableTickets.length < qty) {
+            setMessage("❌ No hay suficientes entradas disponibles")
             return
         }
 
-        const { error } = await supabase
-            .from("tickets")
-            .update({
-                buyer_name: form.buyer_name,
-                email: form.email,
-                paid: form.paid,
-                payment_method: form.payment_method,
-                amount: form.amount,
-                assigned: true
-            })
-            .eq("id", availableTicket.id)
+        for (let ticket of availableTickets) {
 
-        if (error) {
-            setMessage("❌ Error al guardar")
-            return
-        }
-
-        if (form.email) {
-
-            await fetch("/api/send-ticket", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
+            const { error } = await supabase
+                .from("tickets")
+                .update({
+                    buyer_name: form.buyer_name,
                     email: form.email,
-                    code: availableTicket.code,
-                    name: form.buyer_name
+                    paid: form.paid,
+                    payment_method: form.payment_method,
+                    amount: form.amount,
+                    assigned: true
                 })
-            })
+                .eq("id", ticket.id)
 
+            if (!error) {
+                downloadTicketPDF(ticket)
+            }
         }
 
         setForm({
@@ -196,10 +188,11 @@ function Admin() {
             email: "",
             paid: false,
             payment_method: "",
-            amount: ""
+            amount: "",
+            quantity: 1
         })
 
-        setMessage("✅ Entrada guardada y enviada")
+        setMessage(`✅ ${qty} entradas generadas`)
 
         fetchTickets()
     }
@@ -222,6 +215,40 @@ function Admin() {
         })
 
         fetchExpenses()
+    }
+
+    /* ---------------------------
+   GENERAR PDF
+----------------------------*/
+
+    function downloadTicketPDF(ticket) {
+
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "px",
+            format: [400, 700]
+        })
+
+        pdf.setFillColor(10, 10, 10)
+        pdf.rect(0, 0, 400, 700, "F")
+
+        pdf.setTextColor(255, 255, 255)
+
+        pdf.setFontSize(30)
+        pdf.text("ESSNCE", 200, 80, { align: "center" })
+
+        pdf.setFontSize(16)
+        pdf.text(`Ticket #${ticket.id}`, 200, 120, { align: "center" })
+
+        pdf.setFontSize(14)
+        pdf.text(ticket.buyer_name, 200, 160, { align: "center" })
+
+        pdf.setFontSize(12)
+        pdf.text("Escanea el QR al entrar", 200, 200, { align: "center" })
+
+        pdf.text(`Código: ${ticket.code}`, 200, 240, { align: "center" })
+
+        pdf.save(`ticket-${ticket.id}.pdf`)
     }
 
 
@@ -317,6 +344,17 @@ function Admin() {
                     <input type="number" placeholder="Monto pagado"
                         value={form.amount}
                         onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                    />
+
+                    <input
+                        type="number"
+                        min="1"
+                        max="50"
+                        placeholder="Cantidad de entradas"
+                        value={form.quantity}
+                        onChange={(e) =>
+                            setForm({ ...form, quantity: Number(e.target.value) })
+                        }
                     />
 
                     <label>
