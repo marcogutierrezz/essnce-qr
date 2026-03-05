@@ -137,68 +137,6 @@ function Admin() {
         setEditingTicket(ticket)
     }
 
-    async function updateAndResendTicket() {
-
-        setMessage("")
-
-        const { data, error } = await supabase
-            .from("tickets")
-            .update({
-                buyer_name: editingTicket.buyer_name,
-                email: editingTicket.email,
-                payment_method: editingTicket.payment_method,
-                amount: editingTicket.amount,
-                paid: editingTicket.paid
-            })
-            .eq("id", editingTicket.id)
-            .select()
-            .single()
-
-        if (error) {
-            setMessage("❌ Error actualizando entrada")
-            return
-        }
-
-        if (data.email) {
-
-            try {
-
-                console.log("REENVIANDO A:", data.email)
-                console.log("CODE:", data.code)
-
-                const response = await fetch("/api/send-ticket", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        email: data.email,
-                        code: data.code,
-                        name: data.buyer_name
-                    })
-                })
-
-                if (!response.ok) throw new Error()
-
-                setMessage(`✅ Entrada reenviada a ${data.email}`)
-
-            } catch {
-
-                setMessage("⚠ Entrada actualizada pero error enviando correo")
-
-            }
-
-        } else {
-
-            setMessage("⚠ Entrada actualizada pero sin correo")
-
-        }
-
-        setEditingTicket(null)
-
-        fetchTickets()
-    }
-
 
     /* ---------------------------
        CREATE + SEND EMAIL
@@ -427,12 +365,6 @@ function Admin() {
 
                         <small>← editar | borrar →</small>
 
-                        <button
-                            className="btn-secondary"
-                            onClick={() => resendTicket(ticket)}
-                        >
-                            Reenviar entrada
-                        </button>
 
                     </div>
 
