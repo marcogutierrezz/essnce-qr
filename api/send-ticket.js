@@ -44,42 +44,79 @@ export default async function handler(req, res) {
             subject: "Tu entrada para Essnce",
 
             html: `
-<div style="font-family: Arial, Helvetica, sans-serif; background:#f4f4f4; padding:40px">
+<div style="background:#0b0b0b; padding:50px 20px; font-family:Arial, Helvetica, sans-serif;">
 
-    <div style="max-width:520px; margin:auto; background:white; border-radius:12px; padding:35px; text-align:center">
+    <div style="max-width:520px; margin:auto; background:#111; border-radius:16px; padding:40px; text-align:center; color:white;">
 
-        <h1 style="margin:0; color:#111; font-size:28px;">
-            🎟️ Entrada Confirmada
+        <h1 style="
+            font-size:42px;
+            letter-spacing:4px;
+            margin:0;
+            font-weight:900;
+        ">
+            ESSNCE
         </h1>
 
-        <p style="margin-top:20px; font-size:16px; color:#444;">
-            Tu entrada para <strong>Essnce</strong> ha sido registrada correctamente.
-        </p>
-
-        <p style="color:#666; margin-top:10px;">
-            Presenta el código QR adjunto en puerta para ingresar.
+        <p style="
+            color:#ff2f92;
+            font-size:18px;
+            margin-top:10px;
+            letter-spacing:2px;
+        ">
+            ENTRADA CONFIRMADA
         </p>
 
         <div style="
-            margin-top:25px;
-            background:#111;
-            color:white;
-            padding:14px 18px;
-            border-radius:8px;
-            font-size:18px;
-            letter-spacing:2px;
-            display:inline-block;
-        ">
-            Código: ${code}
-        </div>
+            width:60px;
+            height:4px;
+            background:#ff2f92;
+            margin:25px auto;
+            border-radius:10px;
+        "></div>
 
-        <p style="margin-top:25px; color:#777; font-size:14px;">
-            Tu ticket está adjunto en este correo.  
-            Puedes guardarlo o mostrarlo directamente desde tu teléfono.
+        <p style="
+            font-size:16px;
+            color:#ccc;
+            line-height:1.6;
+        ">
+            Tu entrada para <strong>Essnce 3.1</strong> ha sido registrada correctamente.
         </p>
 
-        <hr style="margin:30px 0; border:none; border-top:1px solid #eee;">
+        <p style="
+            font-size:15px;
+            color:#aaa;
+            margin-top:10px;
+        ">
+            Presenta el QR de tu ticket adjunto al llegar al evento.
+        </p>
 
+        <div style="
+            margin-top:35px;
+            padding:18px;
+            border-radius:10px;
+            background:linear-gradient(90deg,#ff2f92,#6c5cff);
+            font-weight:600;
+            letter-spacing:1px;
+        ">
+            ESCANEA TU QR AL ENTRAR
+        </div>
+
+        <div style="
+            margin-top:35px;
+            color:#999;
+            font-size:14px;
+        ">
+            11 de abril | 21:00 - 2:00<br>
+            #12, Calle Los Abetos, San Salvador
+        </div>
+
+        <div style="
+            margin-top:25px;
+            font-size:13px;
+            color:#666;
+        ">
+            Evento exclusivo +18
+        </div>
 
     </div>
 
