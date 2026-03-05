@@ -8,6 +8,7 @@ function Admin() {
     const [tab, setTab] = useState("create")
     const [message, setMessage] = useState("")
     const [editingTicket, setEditingTicket] = useState(null)
+    const [search, setSearch] = useState("")
 
     const startX = useRef(null)
     const dragging = useRef(false)
@@ -50,7 +51,13 @@ function Admin() {
 
     const total = tickets.length
     const registered = tickets.filter(t => t.assigned)
+
+    const filteredRegistered = registered.filter(ticket =>
+        (ticket.buyer_name || "").toLowerCase().includes(search.toLowerCase())
+    )
+
     const available = tickets.filter(t => !t.assigned)
+
     const used = tickets.filter(t => t.used)
     const paid = tickets.filter(t => t.paid)
 
@@ -342,33 +349,48 @@ function Admin() {
 
             {tab === "registered" && (
 
-                registered.map(ticket => (
+                <div>
 
-                    <div
-                        key={ticket.id}
-                        className="ticket-card"
+                    <input
+                        placeholder="Buscar por nombre..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        style={{
+                            padding: "10px",
+                            marginBottom: "15px",
+                            width: "100%",
+                            maxWidth: "300px"
+                        }}
+                    />
 
-                        onMouseDown={handleStart}
-                        onMouseMove={handleMove}
-                        onMouseUp={(e) => handleEnd(e, ticket)}
+                    {filteredRegistered.map(ticket => (
 
-                        onTouchStart={handleStart}
-                        onTouchMove={handleMove}
-                        onTouchEnd={(e) => handleEnd(e, ticket)}
-                    >
+                        <div
+                            key={ticket.id}
+                            className="ticket-card"
 
-                        <div className="ticket-code">{ticket.code}</div>
-                        <p>{ticket.buyer_name}</p>
-                        <p>{ticket.email}</p>
-                        <p>${ticket.amount}</p>
-                        <p>{ticket.payment_method}</p>
+                            onMouseDown={handleStart}
+                            onMouseMove={handleMove}
+                            onMouseUp={(e) => handleEnd(e, ticket)}
 
-                        <small>← editar | borrar →</small>
+                            onTouchStart={handleStart}
+                            onTouchMove={handleMove}
+                            onTouchEnd={(e) => handleEnd(e, ticket)}
+                        >
 
+                            <div className="ticket-code">{ticket.code}</div>
+                            <p>{ticket.buyer_name}</p>
+                            <p>{ticket.email}</p>
+                            <p>${ticket.amount}</p>
+                            <p>{ticket.payment_method}</p>
 
-                    </div>
+                            <small>← editar | borrar →</small>
 
-                ))
+                        </div>
+
+                    ))}
+
+                </div>
 
             )}
 
