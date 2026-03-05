@@ -289,6 +289,11 @@ function Admin() {
 
         try {
 
+            await supabase
+                .from("tickets")
+                .update({ email: newEmail })
+                .eq("id", ticket.id)
+
             const response = await fetch("/api/send-ticket", {
                 method: "POST",
                 headers: {
@@ -304,6 +309,8 @@ function Admin() {
             if (!response.ok) throw new Error()
 
             setMessage(`✅ Entrada reenviada a ${newEmail}`)
+
+            fetchTickets()
 
         } catch {
 
