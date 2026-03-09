@@ -130,7 +130,6 @@ function Admin() {
             .from("tickets")
             .update({
                 buyer_name: null,
-                email: null,
                 paid: false,
                 payment_method: null,
                 amount: 0,
@@ -340,11 +339,6 @@ function Admin() {
                     <input placeholder="Nombre"
                         value={form.buyer_name}
                         onChange={(e) => setForm({ ...form, buyer_name: e.target.value })}
-                    />
-
-                    <input placeholder="Correo"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
                     />
 
                     <input type="number" placeholder="Monto pagado"
