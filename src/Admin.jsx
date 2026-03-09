@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react"
 import { supabase } from "./supabaseClient"
 import jsPDF from "jspdf"
 import QRCode from "qrcode"
+import JSZip from "jszip"
+import { saveAs } from "file-saver"
 
 function Admin() {
 
@@ -196,10 +198,27 @@ function Admin() {
             .filter(t => t.assigned && !t.used)
             .slice(-form.quantity)
 
-        for (let ticket of generated) {
-            await downloadTicketPDF(ticket)
+        if (generated.length === 0) return
+
+        if (generated.length === 1) {
+
+            const pdfBlob = await generateTicketPDF(generated[0])
+            saveAs(pdfBlob, `ticket-${generated[0].id}.pdf`)
+            return
         }
 
+        const zip = new JSZip()
+
+        for (let ticket of generated) {
+
+            const pdfBlob = await generateTicketPDF(ticket)
+
+            zip.file(`ticket-${ticket.id}.pdf`, pdfBlob)
+        }
+
+        const zipFile = await zip.generateAsync({ type: "blob" })
+
+        saveAs(zipFile, "tickets.zip")
     }
 
 
@@ -226,13 +245,15 @@ function Admin() {
    GENERAR PDF
 ----------------------------*/
 
-    async function downloadTicketPDF(ticket) {
+    async function generateTicketPDF(ticket) {
 
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "px",
             format: [540, 960]
         })
+
+        const ticketNumber = ticket.id
 
         const img = new Image()
         img.src = "/ticket-template.jpg"
@@ -242,6 +263,10 @@ function Admin() {
         })
 
         pdf.addImage(img, "JPEG", 0, 0, 540, 960)
+
+        pdf.setFontSize(28)
+        pdf.setTextColor(0, 0, 0)
+        pdf.text(`#${ticketNumber}`, 270, 80, { align: "center" })
 
         const qrData = await QRCode.toDataURL(
             `${window.location.origin}/validate/${ticket.code}`
@@ -253,7 +278,7 @@ function Admin() {
 
         pdf.addImage(qrData, "PNG", x, y, qrSize, qrSize)
 
-        pdf.save(`ticket-${ticket.id}.pdf`)
+        return pdf.output("blob")
     }
 
 
