@@ -253,7 +253,7 @@ function Admin() {
             format: [540, 960]
         })
 
-        const ticketNumber = ticket.id
+        const ticketNumber = ticket.ticket_number
 
         const img = new Image()
         img.src = "/ticket-template.jpg"
