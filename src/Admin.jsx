@@ -203,7 +203,7 @@ function Admin() {
         if (generated.length === 1) {
 
             const pdfBlob = await generateTicketPDF(generated[0])
-            saveAs(pdfBlob, `ticket-${generated[0].id}.pdf`)
+            saveAs(pdfBlob, `ticket-${generated[0].ticket_number}.pdf`)
             return
         }
 
@@ -213,7 +213,7 @@ function Admin() {
 
             const pdfBlob = await generateTicketPDF(ticket)
 
-            zip.file(`ticket-${ticket.id}.pdf`, pdfBlob)
+            zip.file(`ticket-${ticket.ticket_number}.pdf`, pdfBlob)
         }
 
         const zipFile = await zip.generateAsync({ type: "blob" })
@@ -266,7 +266,7 @@ function Admin() {
 
         pdf.setFontSize(28)
         pdf.setTextColor(0, 0, 0)
-        pdf.text(`#${ticketNumber}`, 270, 80, { align: "center" })
+        pdf.text(`#${ticketNumber}`, 270, 120, { align: "center" })
 
         const qrData = await QRCode.toDataURL(
             `${window.location.origin}/validate/${ticket.code}`
@@ -469,7 +469,9 @@ function Admin() {
 
                     <div key={ticket.id} className="ticket-card">
 
-                        <div className="ticket-code">{ticket.code}</div>
+                        <div className="ticket-code">
+                            #{ticket.ticket_number} • {ticket.code}
+                        </div>
 
                         <p>Disponible</p>
 
