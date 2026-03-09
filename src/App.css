@@ -424,3 +424,12 @@ button {
   font-weight: 600;
   cursor: pointer;
 }
+
+.ticket-card {
+  transition: transform 0.2s ease;
+}
+
+.ticket-card.swipe-delete {
+  background: #ff3b3b;
+  color: white;
+}

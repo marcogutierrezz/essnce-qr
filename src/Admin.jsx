@@ -17,7 +17,6 @@ function Admin() {
 
     const [form, setForm] = useState({
         buyer_name: "",
-        email: "",
         paid: false,
         payment_method: "",
         amount: "",
@@ -94,6 +93,12 @@ function Admin() {
         const diff = x - startX.current
 
         e.currentTarget.style.transform = `translateX(${diff}px)`
+
+        if (diff > 50) {
+            e.currentTarget.classList.add("swipe-delete")
+        } else {
+            e.currentTarget.classList.remove("swipe-delete")
+        }
     }
 
     function handleEnd(e, ticket) {
@@ -105,8 +110,6 @@ function Admin() {
 
         e.currentTarget.style.transform = "translateX(0px)"
         dragging.current = false
-
-        if (diff < -120) openEdit(ticket)
 
         if (diff > 120) deleteTicket(ticket)
 
@@ -139,14 +142,6 @@ function Admin() {
     }
 
 
-    /* ---------------------------
-       EDIT POPUP
-    ----------------------------*/
-
-    function openEdit(ticket) {
-        setEditingTicket(ticket)
-    }
-
 
     /* ---------------------------
        CREATE + SEND EMAIL
@@ -171,7 +166,6 @@ function Admin() {
                 .from("tickets")
                 .update({
                     buyer_name: form.buyer_name,
-                    email: form.email,
                     paid: form.paid,
                     payment_method: form.payment_method,
                     amount: form.amount,
@@ -180,13 +174,12 @@ function Admin() {
                 .eq("id", ticket.id)
 
             if (!error) {
-                downloadTicketPDF(ticket)
+
             }
         }
 
         setForm({
             buyer_name: "",
-            email: "",
             paid: false,
             payment_method: "",
             amount: "",
@@ -196,6 +189,18 @@ function Admin() {
         setMessage(`✅ ${qty} entradas generadas`)
 
         fetchTickets()
+    }
+
+    async function downloadGeneratedTickets() {
+
+        const generated = tickets
+            .filter(t => t.assigned && !t.used)
+            .slice(-form.quantity)
+
+        for (let ticket of generated) {
+            await downloadTicketPDF(ticket)
+        }
+
     }
 
 
@@ -376,7 +381,11 @@ function Admin() {
                     </select>
 
                     <button className="btn-primary" onClick={saveToAvailableTicket}>
-                        Guardar y enviar entrada
+                        Guardar entradas
+                    </button>
+
+                    <button className="btn-secondary" onClick={downloadGeneratedTickets}>
+                        Descargar entradas
                     </button>
 
                 </div>
@@ -423,7 +432,7 @@ function Admin() {
                             <p>${ticket.amount}</p>
                             <p>{ticket.payment_method}</p>
 
-                            <small>← editar | borrar →</small>
+                            <small>borrar →</small>
 
                         </div>
 
@@ -509,53 +518,6 @@ function Admin() {
             )}
 
 
-            {/* EDIT POPUP */}
-
-            {editingTicket && (
-
-                <div className="edit-overlay">
-
-                    <div className="edit-popup">
-
-                        <h3>Editar Entrada</h3>
-
-                        <input
-                            value={editingTicket.buyer_name}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, buyer_name: e.target.value })}
-                        />
-
-                        <input
-                            value={editingTicket.email}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, email: e.target.value })}
-                        />
-
-                        <input
-                            type="number"
-                            value={editingTicket.amount}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, amount: e.target.value })}
-                        />
-
-                        <select
-                            value={editingTicket.payment_method}
-                            onChange={(e) => setEditingTicket({ ...editingTicket, payment_method: e.target.value })}
-                        >
-                            <option value="Efectivo">Efectivo</option>
-                            <option value="Transferencia">Transferencia</option>
-                        </select>
-
-                        <button className="btn-primary" onClick={updateAndResendTicket}>
-                            Guardar y reenviar entrada
-                        </button>
-
-                        <button className="btn-secondary" onClick={() => setEditingTicket(null)}>
-                            Cancelar
-                        </button>
-
-                    </div>
-
-                </div>
-
-            )}
 
         </div>
     )
