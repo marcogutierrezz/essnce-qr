@@ -14,6 +14,8 @@ function Admin() {
     const [editingTicket, setEditingTicket] = useState(null)
     const [search, setSearch] = useState("")
 
+    const [lastGeneratedQty, setLastGeneratedQty] = useState(0)
+
     const startX = useRef(null)
     const dragging = useRef(false)
 
@@ -153,6 +155,7 @@ function Admin() {
         setMessage("")
 
         const qty = form.quantity || 1
+        setLastGeneratedQty(qty)
 
         const availableTickets = tickets.filter(t => !t.assigned).slice(0, qty)
 
@@ -196,7 +199,7 @@ function Admin() {
 
         const generated = tickets
             .filter(t => t.assigned && !t.used)
-            .slice(-form.quantity)
+            .slice(-lastGeneratedQty)
 
         if (generated.length === 0) return
 
