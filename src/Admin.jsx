@@ -59,7 +59,20 @@ function Admin() {
     const registered = tickets.filter(t => t.assigned)
 
     const filteredRegistered = registered.filter(ticket =>
+
         (ticket.buyer_name || "").toLowerCase().includes(search.toLowerCase())
+    )
+
+    const groupedTickets = Object.values(
+        filteredRegistered.reduce((acc, ticket) => {
+            const key = ticket.batch_id || ticket.id
+
+            if (!acc[key]) acc[key] = []
+
+            acc[key].push(ticket)
+
+            return acc
+        }, {})
     )
 
     const available = tickets.filter(t => !t.assigned)
@@ -156,6 +169,7 @@ function Admin() {
 
         const qty = form.quantity || 1
         setLastGeneratedQty(qty)
+        const batchId = Date.now().toString()
 
         const availableTickets = tickets.filter(t => !t.assigned).slice(0, qty)
 
@@ -173,7 +187,8 @@ function Admin() {
                     paid: form.paid,
                     payment_method: form.payment_method,
                     amount: form.amount,
-                    assigned: true
+                    assigned: true,
+                    batch_id: batchId
                 })
                 .eq("id", ticket.id)
 
@@ -433,10 +448,10 @@ function Admin() {
                         }}
                     />
 
-                    {filteredRegistered.map(ticket => (
+                    {groupedTickets.map(group => (
 
                         <div
-                            key={ticket.id}
+                            key={group[0].id}
                             className="ticket-card"
 
                             onMouseDown={handleStart}
@@ -448,11 +463,51 @@ function Admin() {
                             onTouchEnd={(e) => handleEnd(e, ticket)}
                         >
 
-                            <div className="ticket-code">{ticket.code}</div>
-                            <p>{ticket.buyer_name}</p>
-                            <p>{ticket.email}</p>
-                            <p>${ticket.amount}</p>
-                            <p>{ticket.payment_method}</p>
+                            <div className="ticket-code">
+                                {group.length} entradas • {new Date(group[0].created_at).toLocaleString()}
+                            </div>
+
+                            <p>{group[0].buyer_name}</p>
+
+                            <p>${group[0].amount}</p>
+
+                            <p>{group[0].payment_method}</p>
+
+                            <div style={{ marginTop: "10px" }}>
+
+                                {group.map(ticket => (
+                                    <span key={ticket.id} style={{ marginRight: "8px" }}>
+                                        #{ticket.ticket_number}
+                                    </span>
+                                ))}
+
+                            </div>
+                            {group[0].whatsapp_sent && (
+                                <p style={{ color: "lime", fontWeight: "bold" }}>
+                                    ✔ Enviado por WhatsApp
+                                </p>
+                            )}
+
+                            {!group[0].whatsapp_sent && (
+                                <button
+                                    onClick={async () => {
+
+                                        for (let ticket of group) {
+
+                                            await supabase
+                                                .from("tickets")
+                                                .update({ whatsapp_sent: true })
+                                                .eq("id", ticket.id)
+
+                                        }
+
+                                        fetchTickets()
+
+                                    }}
+                                >
+                                    Marcar como enviado por WhatsApp
+                                </button>
+                            )}
 
                             <small>borrar →</small>
 
