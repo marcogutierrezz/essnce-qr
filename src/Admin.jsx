@@ -118,7 +118,7 @@ function Admin() {
         }
     }
 
-    function handleEnd(e, ticket) {
+    function handleEnd(e, group) {
 
         if (!dragging.current) return
 
@@ -128,7 +128,7 @@ function Admin() {
         e.currentTarget.style.transform = "translateX(0px)"
         dragging.current = false
 
-        if (diff > 120) deleteTicket(ticket)
+        if (diff > 120) deleteGroup(group)
 
     }
 
@@ -157,6 +157,31 @@ function Admin() {
         fetchTickets()
     }
 
+    async function deleteGroup(group) {
+
+        const confirmDelete = confirm("¿Seguro que quieres borrar estas entradas?")
+
+        if (!confirmDelete) return
+
+        for (let ticket of group) {
+
+            await supabase
+                .from("tickets")
+                .update({
+                    buyer_name: null,
+                    paid: false,
+                    payment_method: null,
+                    amount: 0,
+                    assigned: false,
+                    batch_id: null,
+                    whatsapp_sent: false
+                })
+                .eq("id", ticket.id)
+
+        }
+
+        fetchTickets()
+    }
 
 
     /* ---------------------------
@@ -456,11 +481,11 @@ function Admin() {
 
                             onMouseDown={handleStart}
                             onMouseMove={handleMove}
-                            onMouseUp={(e) => handleEnd(e, ticket)}
+                            onMouseUp={(e) => handleEnd(e, group)}
 
                             onTouchStart={handleStart}
                             onTouchMove={handleMove}
-                            onTouchEnd={(e) => handleEnd(e, ticket)}
+                            onTouchEnd={(e) => handleEnd(e, group)}
                         >
 
                             <div className="ticket-code">
