@@ -311,17 +311,17 @@ function Admin() {
         pdf.setFontSize(34)
         pdf.setTextColor(255, 255, 255)
 
-        pdf.text(`#${ticketNumber}`, 270, 140, { align: "center" })
+        pdf.text(`#${ticketNumber}`, 270, 110, { align: "center" })
 
         pdf.setFont("helvetica", "normal")
         pdf.setFontSize(16)
 
-        pdf.text(`INVITADO POR`, 270, 190, { align: "center" })
+        pdf.text(`INVITADO POR`, 270, 150, { align: "center" })
 
         pdf.setFont("helvetica", "bold")
         pdf.setFontSize(24)
 
-        pdf.text(`${ticket.buyer_name || ""}`, 270, 220, { align: "center" })
+        pdf.text(`${ticket.buyer_name || ""}`, 270, 180, { align: "center" })
 
         const qrData = await QRCode.toDataURL(
             `${window.location.origin}/validate/${ticket.code}`
