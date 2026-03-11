@@ -195,6 +195,7 @@ function Admin() {
         const qty = form.quantity || 1
         setLastGeneratedQty(qty)
         const batchId = Date.now().toString()
+        const soldAt = new Date().toISOString()
 
         const availableTickets = tickets.filter(t => !t.assigned).slice(0, qty)
 
@@ -213,7 +214,8 @@ function Admin() {
                     payment_method: form.payment_method,
                     amount: form.amount,
                     assigned: true,
-                    batch_id: batchId
+                    batch_id: batchId,
+                    sold_at: soldAt
                 })
                 .eq("id", ticket.id)
 
@@ -262,6 +264,33 @@ function Admin() {
         const zipFile = await zip.generateAsync({ type: "blob" })
 
         saveAs(zipFile, "tickets.zip")
+    }
+
+    async function downloadGroupTickets(group) {
+
+        if (group.length === 1) {
+
+            const pdfBlob = await generateTicketPDF(group[0])
+
+            saveAs(pdfBlob, `ticket-${group[0].ticket_number}.pdf`)
+
+            return
+        }
+
+        const zip = new JSZip()
+
+        for (let ticket of group) {
+
+            const pdfBlob = await generateTicketPDF(ticket)
+
+            zip.file(`ticket-${ticket.ticket_number}.pdf`, pdfBlob)
+
+        }
+
+        const zipFile = await zip.generateAsync({ type: "blob" })
+
+        saveAs(zipFile, "tickets.zip")
+
     }
 
 
@@ -458,10 +487,6 @@ function Admin() {
                         Guardar entradas
                     </button>
 
-                    <button className="btn-secondary" onClick={downloadGeneratedTickets}>
-                        Descargar entradas
-                    </button>
-
                 </div>
 
             )}
@@ -501,7 +526,7 @@ function Admin() {
                         >
 
                             <div className="ticket-code">
-                                {group.length} entradas • {new Date(group[0].created_at).toLocaleString()}
+                                {group.length} entradas • {new Date(group[0].sold_at).toLocaleString()}
                             </div>
 
                             <p>{group[0].buyer_name}</p>
@@ -545,6 +570,14 @@ function Admin() {
                                     Marcar como enviado por WhatsApp
                                 </button>
                             )}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    downloadGroupTickets(group)
+                                }}
+                            >
+                                Descargar entradas
+                            </button>
 
                             <small>borrar →</small>
 
