@@ -307,9 +307,21 @@ function Admin() {
 
         pdf.addImage(img, "JPEG", 0, 0, 540, 960)
 
-        pdf.setFontSize(28)
-        pdf.setTextColor(0, 0, 0)
-        pdf.text(`#${ticketNumber}`, 270, 120, { align: "center" })
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(34)
+        pdf.setTextColor(255, 255, 255)
+
+        pdf.text(`#${ticketNumber}`, 270, 140, { align: "center" })
+
+        pdf.setFont("helvetica", "normal")
+        pdf.setFontSize(16)
+
+        pdf.text(`INVITADO POR`, 270, 190, { align: "center" })
+
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(24)
+
+        pdf.text(`${ticket.buyer_name || ""}`, 270, 220, { align: "center" })
 
         const qrData = await QRCode.toDataURL(
             `${window.location.origin}/validate/${ticket.code}`
