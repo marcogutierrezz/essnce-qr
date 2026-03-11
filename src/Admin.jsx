@@ -552,6 +552,7 @@ function Admin() {
 
                             {!group[0].whatsapp_sent && (
                                 <button
+                                    className="btn-whatsapp"
                                     onClick={async () => {
 
                                         for (let ticket of group) {
@@ -571,6 +572,7 @@ function Admin() {
                                 </button>
                             )}
                             <button
+                                className="btn-download"
                                 onClick={(e) => {
                                     e.stopPropagation()
                                     downloadGroupTickets(group)
