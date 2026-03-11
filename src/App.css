@@ -451,7 +451,7 @@ button {
 }
 
 .btn-download {
-  background: #00c853;
+  background: #b829e4;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -463,7 +463,7 @@ button {
 }
 
 .btn-download:hover {
-  background: #00b34a;
+  background: #d245ee;
   transform: translateY(-1px);
 }
 
