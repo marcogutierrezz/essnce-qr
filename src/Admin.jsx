@@ -526,7 +526,13 @@ function Admin() {
                         >
 
                             <div className="ticket-code">
-                                {group.length} entradas • {new Date(group[0].sold_at).toLocaleString()}
+                                {group.length} entradas • {new Date(group[0].sold_at).toLocaleString(undefined, {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    year: "numeric",
+                                    month: "numeric",
+                                    day: "numeric"
+                                })}
                             </div>
 
                             <p>{group[0].buyer_name}</p>
