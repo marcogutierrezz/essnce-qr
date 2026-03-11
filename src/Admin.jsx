@@ -550,36 +550,41 @@ function Admin() {
                                 </p>
                             )}
 
-                            {!group[0].whatsapp_sent && (
+                            <div className="ticket-actions">
+
+                                {!group[0].whatsapp_sent && (
+                                    <button
+                                        className="btn-whatsapp"
+                                        onClick={async () => {
+
+                                            for (let ticket of group) {
+
+                                                await supabase
+                                                    .from("tickets")
+                                                    .update({ whatsapp_sent: true })
+                                                    .eq("id", ticket.id)
+
+                                            }
+
+                                            fetchTickets()
+
+                                        }}
+                                    >
+                                        Marcar como enviado por WhatsApp
+                                    </button>
+                                )}
+
                                 <button
-                                    className="btn-whatsapp"
-                                    onClick={async () => {
-
-                                        for (let ticket of group) {
-
-                                            await supabase
-                                                .from("tickets")
-                                                .update({ whatsapp_sent: true })
-                                                .eq("id", ticket.id)
-
-                                        }
-
-                                        fetchTickets()
-
+                                    className="btn-download"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        downloadGroupTickets(group)
                                     }}
                                 >
-                                    Marcar como enviado por WhatsApp
+                                    Descargar entradas
                                 </button>
-                            )}
-                            <button
-                                className="btn-download"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    downloadGroupTickets(group)
-                                }}
-                            >
-                                Descargar entradas
-                            </button>
+
+                            </div>
 
                             <small>borrar →</small>
 
