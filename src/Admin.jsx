@@ -316,12 +316,12 @@ function Admin() {
         pdf.setFont("helvetica", "normal")
         pdf.setFontSize(16)
 
-        pdf.text(`INVITADO POR`, 270, 600, { align: "center" })
+        pdf.text(`INVITADO POR`, 270, 675, { align: "center" })
 
         pdf.setFont("helvetica", "bold")
         pdf.setFontSize(24)
 
-        pdf.text(`${ticket.buyer_name || ""}`, 270, 650, { align: "center" })
+        pdf.text(`${ticket.buyer_name || ""}`, 270, 700, { align: "center" })
 
         const qrData = await QRCode.toDataURL(
             `${window.location.origin}/validate/${ticket.code}`
