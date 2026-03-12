@@ -1,28 +1,27 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+
+const PIN = "022724"
 
 export default function PinGate({ children }) {
 
-    const [pin, setPin] = useState("")
-    const [authorized, setAuthorized] = useState(
-        localStorage.getItem("event_auth") === "true"
-    )
+    const [enteredPin, setEnteredPin] = useState("")
+    const [authorized, setAuthorized] = useState(false)
 
-    async function checkPin() {
+    useEffect(() => {
 
-        const res = await fetch(
-            "https://TU_PROJECT_ID.supabase.co/functions/v1/check-pin",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ pin })
-            }
-        )
+        const saved = localStorage.getItem("event_pin")
 
-        if (res.ok) {
+        if (saved === PIN) {
+            setAuthorized(true)
+        }
 
-            localStorage.setItem("event_auth", "true")
+    }, [])
+
+    function handleSubmit() {
+
+        if (enteredPin === PIN) {
+
+            localStorage.setItem("event_pin", PIN)
             setAuthorized(true)
 
         } else {
@@ -36,18 +35,25 @@ export default function PinGate({ children }) {
     if (!authorized) {
 
         return (
-            <div className="pin-screen">
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                gap: "10px"
+            }}>
 
-                <h2>Acceso Staff</h2>
+                <h2>Ingresar PIN</h2>
 
                 <input
                     type="password"
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value)}
+                    value={enteredPin}
+                    onChange={(e) => setEnteredPin(e.target.value)}
                     placeholder="PIN"
                 />
 
-                <button onClick={checkPin}>
+                <button onClick={handleSubmit}>
                     Entrar
                 </button>
 
