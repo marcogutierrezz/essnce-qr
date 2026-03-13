@@ -9,7 +9,7 @@ export default function PinGate({ children }) {
 
     useEffect(() => {
 
-        const saved = localStorage.getItem("event_pin")
+        const saved = sessionStorage.getItem("event_pin")
 
         if (saved === PIN) {
             setAuthorized(true)
@@ -21,7 +21,7 @@ export default function PinGate({ children }) {
 
         if (enteredPin === PIN) {
 
-            localStorage.setItem("event_pin", PIN)
+            sessionStorage.setItem("event_pin", PIN)
             setAuthorized(true)
 
         } else {
