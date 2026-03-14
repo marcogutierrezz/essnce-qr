@@ -525,14 +525,17 @@ function Admin() {
                             onTouchEnd={(e) => handleEnd(e, group)}
                         >
 
-                            {group.length} entradas • {new Date(group[0].sold_at).toLocaleDateString("es-SV", {
-                                timeZone: "America/El_Salvador"
-                            })}, {new Date(group[0].sold_at).toLocaleTimeString("es-SV", {
-                                timeZone: "America/El_Salvador",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true
-                            })}
+                            <div className="ticket-code">
+                                {group.length} entradas • {new Date(group[0].sold_at).toLocaleString("es-SV", {
+                                    timeZone: "America/El_Salvador",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                    year: "numeric",
+                                    month: "numeric",
+                                    day: "numeric"
+                                })}
+                            </div>
 
                             <p>{group[0].buyer_name}</p>
 
