@@ -526,7 +526,8 @@ function Admin() {
                         >
 
                             <div className="ticket-code">
-                                {group.length} entradas • {new Date(group[0].sold_at).toLocaleString(undefined, {
+                                {group.length} entradas • {new Date(group[0].sold_at).toLocaleString("es-SV", {
+                                    timeZone: "America/El_Salvador",
                                     hour: "2-digit",
                                     minute: "2-digit",
                                     year: "numeric",
