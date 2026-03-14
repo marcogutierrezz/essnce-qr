@@ -530,7 +530,7 @@ function Admin() {
                                     timeZone: "America/El_Salvador",
                                     hour: "2-digit",
                                     minute: "2-digit",
-                                    hour12: false,
+                                    hour12: true,
                                     year: "numeric",
                                     month: "numeric",
                                     day: "numeric"
