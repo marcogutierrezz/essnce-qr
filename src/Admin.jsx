@@ -195,7 +195,7 @@ function Admin() {
         const qty = form.quantity || 1
         setLastGeneratedQty(qty)
         const batchId = Date.now().toString()
-        const soldAt = new Date().toLocaleString()
+        const soldAt = new Date().toISOString()
 
         const availableTickets = tickets.filter(t => !t.assigned).slice(0, qty)
 
@@ -212,7 +212,7 @@ function Admin() {
                     buyer_name: form.buyer_name,
                     paid: form.paid,
                     payment_method: form.payment_method,
-                    amount: form.amount,
+                    amount: Number(form.amount),
                     assigned: true,
                     batch_id: batchId,
                     sold_at: soldAt
